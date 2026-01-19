@@ -818,14 +818,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d726ebe4bf0c354eabf4763830fce33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogoEnfermera
-  panelDialogo: {fileID: 31319289}
-  textoPantalla: {fileID: 912149035}
-  minijuegoCanvas: {fileID: 537376813}
-  frases:
-  - "Enfermera: Llega tarde. Deje las muestras en la bandeja roja. Si\xE9ntese y
-    s\xFAbase la manga. Falta la prueba de sangre."
-  - "Jaime: \xBFSangre? \xBFAhora? Nadie me dijo nada de sangre..."
-  - 'Enfermera: Es requisito obligatorio. Brazo quieto. Si se mueve, le va a doler.'
 --- !u!4 &228968909
 Transform:
   m_ObjectHideFlags: 0
@@ -3635,7 +3627,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6feb0537f7c3de349b95f7c9450bbb27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Meta
-  scriptCharla: {fileID: 228968908}
 --- !u!65 &1367638851
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4041,9 +4032,16 @@ MonoBehaviour:
   velocidad: 5
   velocidadRotacion: 10
   animadorJaime: {fileID: 1461516265}
-  barraVerguenza: {fileID: 2092613610}
+  barraAdaptacion: {fileID: 0}
   panelDerrota: {fileID: 789855465}
-  velocidadVerguenza: 20
+  adaptacionActual: 50
+  velocidadDesgaste: 1.5
+  transformZaida: {fileID: 0}
+  distanciaParaHablar: 3
+  puntosRecuperacion: 20
+  panelDialogo: {fileID: 0}
+  textoDialogo: {fileID: 0}
+  listaDialogos: []
 --- !u!54 &1461516259
 Rigidbody:
   m_ObjectHideFlags: 0
