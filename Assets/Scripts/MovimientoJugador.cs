@@ -64,7 +64,6 @@ public class MovimientoJugador : MonoBehaviour
         // --- MODO CONVERSACIÓN ---
         if (hablando)
         {
-            // seguridad extra
             movimientoInput = Vector3.zero;
             if (animadorJaime != null)
                 animadorJaime.SetBool("caminando", false);
@@ -145,7 +144,6 @@ public class MovimientoJugador : MonoBehaviour
     {
         hablando = true;
 
-        // 🔴 CLAVE: detener movimiento y animación
         movimientoInput = Vector3.zero;
         if (animadorJaime != null)
             animadorJaime.SetBool("caminando", false);
@@ -215,3 +213,4 @@ public class MovimientoJugador : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
+
