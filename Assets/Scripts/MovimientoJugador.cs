@@ -101,18 +101,22 @@ public class MovimientoJugador : MonoBehaviour
         adaptacionActual -= velocidadDesgaste * Time.deltaTime;
 
         // --- INTERACCIÓN CON ZAIDA ---
-        if (transformZaida != null && !conversacionTerminada)
+        if (transformZaida != null)
         {
             float distancia = Vector3.Distance(transform.position, transformZaida.position);
 
-            if (distancia <= distanciaParaHablar && Input.GetKeyDown(KeyCode.E))
-                EmpezarConversacion();
-
+            // 1. REGLA DE CURACIÓN: Si estoy cerca, me curo SIEMPRE (hable o no)
             if (distancia <= distanciaParaHablar)
-                adaptacionActual += 5f * Time.deltaTime;
-        }
+            {
+                adaptacionActual += 3f * Time.deltaTime; // Se cura suavemente
 
-        adaptacionActual = Mathf.Clamp(adaptacionActual, 0f, 100f);
+                // 2. REGLA DE HABLAR: Solo puedo iniciar charla si NO he terminado antes
+                if (!conversacionTerminada && Input.GetKeyDown(KeyCode.E))
+                {
+                    EmpezarConversacion();
+                }
+            }
+        }
 
         if (barraAdaptacion != null)
             barraAdaptacion.value = adaptacionActual;
