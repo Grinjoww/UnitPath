@@ -29,7 +29,7 @@ public class MovimientoJugador : MonoBehaviour
 
     // VARIABLES INTERNAS
     private int indiceDialogo = 0;
-    private bool hablando = false;
+    public bool hablando = false;
     private bool conversacionTerminada = false;
 
     private GameObject objetoAActivarAlFinal;
