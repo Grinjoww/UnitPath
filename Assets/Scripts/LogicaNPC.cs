@@ -1,97 +1,110 @@
 using UnityEngine;
-using TMPro; // Aunque no usemos strings directos, mantenemos esto por si acaso
+using TMPro;
 
 public class LogicaNPC : MonoBehaviour
 {
     [Header("--- UI GENERAL ---")]
     public GameObject panelDialogo;
-    public GameObject contenedorBotones;   // El grupo con los botones A y B
-    public GameObject textoPreguntaInicial; // (Opcional) El texto que dice "¿Qué quieres hacer?" al inicio
+    public GameObject contenedorBotones;
+    public GameObject textoPreguntaInicial; // Opcional
 
-    [Header("--- OBJETOS DE RESPUESTA (Arrastra tus Textos aquí) ---")]
-    // Aquí arrastras los objetos de texto que YA creaste y acomodaste en Unity
+    [Header("--- OBJETOS DE RESPUESTA ---")]
     public GameObject objetoRespuestaA;
     public GameObject objetoRespuestaB;
 
     [Header("--- JUGADOR ---")]
     public MovimientoJugador scriptJugador;
 
-    [Header("--- CONSECUENCIAS (Daño) ---")]
+    [Header("--- CONFIGURACIÓN ---")]
     public float penalizacionA = 10f;
     public float penalizacionB = 15f;
 
+    // ESTADOS INTERNOS
     private bool jugadorCerca = false;
-    private bool dialogoActivo = false;
+    private bool menuAbierto = false;       // Estamos eligiendo A o B
+    private bool mostrandoResultado = false; // Ya elegimos y estamos leyendo la respuesta
 
     void Update()
     {
-        if (jugadorCerca && Input.GetKeyDown(KeyCode.E) && !dialogoActivo)
+        // 1. ABRIR EL MENÚ (Solo si no estamos haciendo nada más)
+        if (jugadorCerca && Input.GetKeyDown(KeyCode.E) && !menuAbierto && !mostrandoResultado)
         {
             AbrirMenu();
+        }
+
+        // 2. CERRAR EL RESULTADO CON ESPACIO (Lo que pediste)
+        if (mostrandoResultado)
+        {
+            // Si presionas Espacio O Enter, se cierra al instante
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.E))
+            {
+                CerrarTodo();
+            }
         }
     }
 
     void AbrirMenu()
     {
-        dialogoActivo = true;
-        Time.timeScale = 0f;
-        panelDialogo.SetActive(true);
+        menuAbierto = true;
 
-        // 1. Mostrar botones y la pregunta inicial
+        // IMPORTANTE: No usamos Time.timeScale = 0.
+        // En su lugar, bloqueamos a Jaime usando la variable que hiciste pública.
+        if (scriptJugador != null)
+        {
+            scriptJugador.hablando = true; // Jaime deja de caminar, pero respira
+            scriptJugador.GetComponent<Rigidbody>().linearVelocity = Vector3.zero; // Frenado en seco
+        }
+
+        panelDialogo.SetActive(true);
         contenedorBotones.SetActive(true);
         if (textoPreguntaInicial != null) textoPreguntaInicial.SetActive(true);
 
-        // 2. Asegurarnos que las respuestas estén APAGADAS al inicio
+        // Asegurar que las respuestas estén apagadas
         if (objetoRespuestaA != null) objetoRespuestaA.SetActive(false);
         if (objetoRespuestaB != null) objetoRespuestaB.SetActive(false);
     }
 
     public void SeleccionarOpcionA()
     {
-        // Pasamos el OBJETO A
         EjecutarConsecuencia(objetoRespuestaA, penalizacionA);
     }
 
     public void SeleccionarOpcionB()
     {
-        // Pasamos el OBJETO B
         EjecutarConsecuencia(objetoRespuestaB, penalizacionB);
     }
 
-    // Ahora esta función recibe un GameObject, no un string
     void EjecutarConsecuencia(GameObject respuestaAActivar, float daño)
     {
-        // 1. Ocultar botones y la pregunta inicial
+        // Cambiamos de fase: de Menú a Resultado
+        menuAbierto = false;
+        mostrandoResultado = true;
+
+        // Ocultar botones
         contenedorBotones.SetActive(false);
         if (textoPreguntaInicial != null) textoPreguntaInicial.SetActive(false);
 
-        // 2. ENCENDER el texto de respuesta correcto (el que ya acomodaste bonito)
-        if (respuestaAActivar != null)
-        {
-            respuestaAActivar.SetActive(true);
-        }
+        // Mostrar la respuesta elegida
+        if (respuestaAActivar != null) respuestaAActivar.SetActive(true);
 
-        // 3. Aplicar daño
-        if (scriptJugador != null)
-        {
-            scriptJugador.adaptacionActual -= daño;
-        }
+        // Aplicar daño
+        if (scriptJugador != null) scriptJugador.adaptacionActual -= daño;
 
-        // 4. Cerrar todo en 3 segundos
-        StartCoroutine(CerrarDialogoDelay());
+        // YA NO usamos Corrutina de tiempo.
+        // Ahora esperamos en el Update() a que presiones Espacio.
     }
 
-    System.Collections.IEnumerator CerrarDialogoDelay()
+    void CerrarTodo()
     {
-        yield return new WaitForSecondsRealtime(4f); // Les damos 4 segundos para leer bien
+        mostrandoResultado = false;
+        menuAbierto = false;
 
-        // Apagamos todo para limpiar
         panelDialogo.SetActive(false);
         if (objetoRespuestaA != null) objetoRespuestaA.SetActive(false);
         if (objetoRespuestaB != null) objetoRespuestaB.SetActive(false);
 
-        Time.timeScale = 1f;
-        dialogoActivo = false;
+        // Liberamos a Jaime para que camine de nuevo
+        if (scriptJugador != null) scriptJugador.hablando = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -105,6 +118,11 @@ public class LogicaNPC : MonoBehaviour
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player")) jugadorCerca = false;
+        if (other.CompareTag("Player"))
+        {
+            jugadorCerca = false;
+            // Si te alejas a media charla, cerramos todo por seguridad
+            if (menuAbierto || mostrandoResultado) CerrarTodo();
+        }
     }
 }
