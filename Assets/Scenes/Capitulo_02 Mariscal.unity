@@ -1566,7 +1566,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1.08
+  m_Radius: 1.19
   m_Center: {x: 2.03941, y: 0.4, z: 1.21714}
 --- !u!23 &297858791
 MeshRenderer:
@@ -6525,7 +6525,7 @@ MonoBehaviour:
   adaptacionActual: 30
   velocidadDesgaste: 1
   transformZaida: {fileID: 927389224}
-  distanciaParaHablar: 4
+  distanciaParaHablar: 3
   puntosRecuperacion: 20
   panelDialogo: {fileID: 31319289}
   textoDialogo: {fileID: 912149035}
@@ -12984,7 +12984,7 @@ GameObject:
   - component: {fileID: 7153715342055040530}
   - component: {fileID: 7153715342055040531}
   - component: {fileID: 7153715342055040532}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13002,7 +13002,7 @@ GameObject:
   - component: {fileID: 7093868576484312238}
   - component: {fileID: 7067725020156889828}
   - component: {fileID: 7077089100678811442}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Knob
   m_TagString: Untagged
   m_Icon: {fileID: 0}
