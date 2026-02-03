@@ -212,5 +212,11 @@ public class MovimientoJugador : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+    public void OnFootstep(AnimationEvent animationEvent)
+    {
+        // La dejamos vacía intencionalmente.
+        // Así la animación encuentra a quién llamar, pero no hacemos nada.
+        // (Aquí podrías poner un sonido de pasos en el futuro si quisieras)
+    }
 }
 
