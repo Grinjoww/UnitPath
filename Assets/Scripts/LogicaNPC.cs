@@ -3,44 +3,41 @@ using TMPro;
 
 public class LogicaNPC : MonoBehaviour
 {
-    [Header("--- CONEXIÓN CON IA (NUEVO) ---")]
-    public GeminiChat cerebroIA;         // Arrastra aquí al objeto "GeminiManager"
-    public TMP_Text textoDondeHablaLaIA; // El cuadro de texto del Canvas donde saldrá la respuesta
+    [Header("--- CONEXIÓN CON IA ---")]
+    public GeminiChat cerebroIA;
+    public TMP_Text textoDondeHablaLaIA;
 
-    [Header("--- UI GENERAL (IGUAL QUE ANTES) ---")]
+    [Header("--- UI GENERAL ---")]
     public GameObject panelDialogo;
     public GameObject contenedorBotones;
     public GameObject textoPreguntaInicial;
 
-    // YA NO NECESITAMOS "objetoRespuestaA" NI "B" PORQUE EL TEXTO ES DINÁMICO
-    // public GameObject objetoRespuestaA; // Borrado
-    // public GameObject objetoRespuestaB; // Borrado
+    [Header("--- JUGADOR (CAMBIO IMPORTANTE) ---")]
+    // Antes era: public MovimientoJugador scriptJugador;
+    // Ahora es:
+    public EstadisticasJugador scriptJugador;
 
-    [Header("--- JUGADOR (IGUAL) ---")]
-    public MovimientoJugador scriptJugador;
-
-    [Header("--- CONFIGURACIÓN DE PREGUNTAS (NUEVO) ---")]
-    // Aquí escribes lo que quieres que el botón le pregunte a la IA
+    [Header("--- CONFIGURACIÓN DE PREGUNTAS ---")]
     [TextArea] public string preguntaParaOpcionA = "Disculpa, ¿dónde dejo estas muestras biológicas?";
     public float penalizacionA = 10f;
 
     [TextArea] public string preguntaParaOpcionB = "Ehh... ¿el edificio de... salud?";
     public float penalizacionB = 15f;
 
-    // ESTADOS INTERNOS (IGUAL)
+    // ESTADOS INTERNOS
     private bool jugadorCerca = false;
     private bool menuAbierto = false;
     private bool mostrandoResultado = false;
 
     void Update()
     {
-        // 1. ABRIR EL MENÚ (Igual que tu script)
+        // 1. ABRIR EL MENÚ
         if (jugadorCerca && Input.GetKeyDown(KeyCode.E) && !menuAbierto && !mostrandoResultado)
         {
             AbrirMenu();
         }
 
-        // 2. CERRAR EL RESULTADO CON ESPACIO (Igual que tu script)
+        // 2. CERRAR EL RESULTADO CON ESPACIO
         if (mostrandoResultado)
         {
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.E))
@@ -54,43 +51,41 @@ public class LogicaNPC : MonoBehaviour
     {
         menuAbierto = true;
 
-        // BLOQUEO DE JAIME (Tu lógica intacta)
+        // --- CAMBIO: USAMOS EL NUEVO SISTEMA DE BLOQUEO ---
         if (scriptJugador != null)
         {
-            scriptJugador.hablando = true;
-            // Nota: Si usas Unity viejo es .velocity, si usas Unity 6 es .linearVelocity.
-            // Dejo el que tú tenías:
-            if (scriptJugador.GetComponent<Rigidbody>() != null)
-                scriptJugador.GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
+            // Llamamos a la función que frena al Starter Assets
+            scriptJugador.BloquearMovimiento(true);
         }
+
+        // --- IMPORTANTE: LIBERAR EL MOUSE ---
+        // Starter Assets atrapa el cursor. Necesitamos soltarlo para dar clic a los botones.
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         panelDialogo.SetActive(true);
         contenedorBotones.SetActive(true);
         if (textoPreguntaInicial != null) textoPreguntaInicial.SetActive(true);
 
-        // Limpiamos el texto para que no salga la respuesta anterior
+        // Limpiamos el texto anterior de la IA
         if (textoDondeHablaLaIA != null) textoDondeHablaLaIA.text = "";
     }
 
-    // --- AQUÍ ESTÁ LA MAGIA DE LA IA ---
+    // --- INTERACCIÓN CON GEMINI ---
 
     public void SeleccionarOpcionA()
     {
-        // 1. Mandamos la pregunta A a Gemini
         if (cerebroIA != null)
             cerebroIA.EnviarPregunta(preguntaParaOpcionA);
 
-        // 2. Ejecutamos consecuencias (Daño y UI)
         EjecutarConsecuencia(penalizacionA);
     }
 
     public void SeleccionarOpcionB()
     {
-        // 1. Mandamos la pregunta B a Gemini
         if (cerebroIA != null)
             cerebroIA.EnviarPregunta(preguntaParaOpcionB);
 
-        // 2. Ejecutamos consecuencias
         EjecutarConsecuencia(penalizacionB);
     }
 
@@ -99,14 +94,10 @@ public class LogicaNPC : MonoBehaviour
         menuAbierto = false;
         mostrandoResultado = true;
 
-        // Ocultar botones y pregunta inicial
         contenedorBotones.SetActive(false);
         if (textoPreguntaInicial != null) textoPreguntaInicial.SetActive(false);
 
-        // NOTA: Ya no activamos objetoRespuestaA/B porque Gemini escribirá
-        // directamente en "textoDondeHablaLaIA".
-
-        // Aplicar daño (Tu lógica intacta)
+        // Aplicamos daño (Esto sigue funcionando igual porque EstadisticasJugador tiene esa variable)
         if (scriptJugador != null) scriptJugador.adaptacionActual -= daño;
     }
 
@@ -117,16 +108,25 @@ public class LogicaNPC : MonoBehaviour
 
         panelDialogo.SetActive(false);
 
-        // Liberamos a Jaime (Tu lógica intacta)
-        if (scriptJugador != null) scriptJugador.hablando = false;
+        // --- CAMBIO: DESBLOQUEAR ---
+        if (scriptJugador != null)
+        {
+            scriptJugador.BloquearMovimiento(false); // Jaime puede caminar de nuevo
+        }
+
+        // VOLVER A ATRAPAR EL MOUSE (Para poder girar la cámara)
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        // Starter Assets usa el tag "Player" en el objeto padre, así que esto funcionará bien
         if (other.CompareTag("Player"))
         {
             jugadorCerca = true;
-            if (scriptJugador == null) scriptJugador = other.GetComponent<MovimientoJugador>();
+            // Buscamos el nuevo script en el objeto que entró
+            if (scriptJugador == null) scriptJugador = other.GetComponent<EstadisticasJugador>();
         }
     }
 
