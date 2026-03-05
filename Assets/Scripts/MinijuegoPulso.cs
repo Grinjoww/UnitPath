@@ -130,7 +130,7 @@ public class MinijuegoPulso : MonoBehaviour
         float distancia = Mathf.Abs(aguja.anchoredPosition.x - zonaSegura.anchoredPosition.x);
 
         // ¡Usamos el margen generoso!
-        float margenError = zonaSegura.rect.width;
+        float margenError = zonaSegura.rect.width *1.5f;
 
         if (distancia < margenError)
         {
