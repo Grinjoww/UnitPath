@@ -22,7 +22,7 @@ public class EnterMaze : MonoBehaviour
             if (mensajeUI != null)
             {
                 mensajeUI.gameObject.SetActive(true);
-                mensajeUI.text = "Presiona F para entrar al minijuego";
+                mensajeUI.text = "Presiona F para entrar al edificio";
             }
 
             if (panelUI != null)
