@@ -9,6 +9,23 @@ EditorBuildSettings:
     path: Assets/Scenes/Capitulo_02 Mariscal.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
+    path: Assets/Scenes/Outro.unity
+    guid: 322f73f7d8cc509499bee2c07321745b
+  - enabled: 1
+    path: Assets/Scenes/Intro.unity
+    guid: 3c9e0a48ff280c94d8f62fcb904dcef7
+  - enabled: 1
+    path: Assets/Scenes/Capitulo_04_Psicologia.unity
+    guid: 379be682aad60624f9227a87678474a1
+  - enabled: 1
+    path: Assets/Scenes/Capitulo_04_Biblioteca.unity
+    guid: 5356b34588bea094a92c32e443ecc652
+  - enabled: 1
+    path: Assets/Scenes/Capitulo_04_Enfermeria.unity
+    guid: 9f113d806efeb944b8da0cf56b328a51
+  - enabled: 1
+    path: Assets/Scenes/Capitulo_04_Bienestar.unity
+    guid: afa59dcbe2ad76043aa7ce31d75f687e
     path: Assets/Scenes/MazeScene.unity
     guid: d4fb941c23575124caa1580ebbfe14da
   - enabled: 1
