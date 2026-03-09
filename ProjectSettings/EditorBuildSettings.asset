@@ -6,11 +6,20 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/MenuPrincipal.unity
-    guid: 19c3968567c90824d97fe9eb69dc7515
-  - enabled: 1
     path: Assets/Scenes/Capitulo_02 Mariscal.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/MazeScene.unity
+    guid: d4fb941c23575124caa1580ebbfe14da
+  - enabled: 1
+    path: Assets/Scenes/WinScene.unity
+    guid: 066649a3350981d47a1b8dc53b0a017d
+  - enabled: 1
+    path: Assets/Scenes/GameOverScene.unity
+    guid: 972d74ea3f77ad546965ad82b7ea786e
+  - enabled: 1
+    path: Assets/Scenes/Capitulo_03 Castro.unity
+    guid: 6d42612dc08826643a6efa366948926c
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 9e7be553448fa2546aea5752021cbcf7, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
