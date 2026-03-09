@@ -18,13 +18,17 @@ public class Meta : MonoBehaviour
             // Desactivar el movimiento del jugador
             other.GetComponent<PlayerMovement>().enabled = false;
 
-            // Activar el panel de victoria (solo si está asignado)
+            // Activar el panel de victoria
             if (winPanel != null)
             {
                 winPanel.SetActive(true);
             }
 
-            // Destruir el objeto Meta para que no arrastre referencias a la siguiente escena
+            // Mostrar el cursor para poder usar los botones
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+
+            // Destruir el objeto Meta para evitar errores en la siguiente escena
             Destroy(gameObject);
         }
     }
