@@ -13,7 +13,8 @@ public class EstadisticasJugador : MonoBehaviour
 
     // Referencias internas
     private ThirdPersonController controladorMovimiento;
-    private StarterAssetsInputs _input; // <--- NUEVA REFERENCIA A LOS CONTROLES
+    private StarterAssetsInputs _input;
+    private Animator _animator; // <--- 1. AGREGAMOS EL ANIMATOR AQUÍ
 
     // ESTADO
     private bool estaBloqueado = false;
@@ -23,15 +24,14 @@ public class EstadisticasJugador : MonoBehaviour
     {
         Time.timeScale = 1f;
 
-        // 2. Asegurar que el controlador esté encendido al nacer
+        controladorMovimiento = GetComponent<ThirdPersonController>();
+        _input = GetComponent<StarterAssetsInputs>();
+        _animator = GetComponent<Animator>(); // <--- 2. LO CONECTAMOS AQUÍ
+
         if (controladorMovimiento != null) controladorMovimiento.enabled = true;
 
-        // 3. Bloquear el cursor de nuevo para que no se vea la flecha del mouse
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        controladorMovimiento = GetComponent<ThirdPersonController>();
-        _input = GetComponent<StarterAssetsInputs>(); // Conectamos con los inputs
 
         if (barraAdaptacion != null) barraAdaptacion.value = adaptacionActual;
         if (panelDerrota != null) panelDerrota.SetActive(false);
@@ -40,24 +40,21 @@ public class EstadisticasJugador : MonoBehaviour
     void Update()
     {
         // --- 1. BLOQUEO TOTAL DE INPUTS (Anti-Saltos) ---
-        // Si estamos hablando, forzamos a que el juego crea que NO estás tocando nada.
         if (estaBloqueado && _input != null)
         {
-            _input.move = Vector2.zero; // Anula movimiento WASD
-            _input.jump = false;        // Anula la Barra Espaciadora (Salto)
-            _input.sprint = false;      // Anula el Shift (Correr)
+            _input.move = Vector2.zero;
+            _input.jump = false;
+            _input.sprint = false;
         }
 
         // --- 2. LÓGICA DE VIDA ---
-        if (!estaBloqueado) // Solo desgasta vida si no estás en pausa/dialogo (Opcional)
+        if (!estaBloqueado)
         {
             adaptacionActual -= velocidadDesgaste * Time.deltaTime;
         }
 
-        // Actualizar barra
         if (barraAdaptacion != null) barraAdaptacion.value = adaptacionActual;
 
-        // Morir
         if (adaptacionActual <= 0) Morir();
     }
 
@@ -83,21 +80,26 @@ public class EstadisticasJugador : MonoBehaviour
         if (controladorMovimiento != null)
         {
             controladorMovimiento.LockCameraPosition = bloquear;
-            controladorMovimiento.enabled = !bloquear; // ← LA MAGIA
+
+            // --- 3. AQUÍ LE DECIMOS A LA ANIMACIÓN QUE SE DETENGA ---
+            if (bloquear && _animator != null)
+            {
+                _animator.SetFloat("Speed", 0f);
+                _animator.SetFloat("MotionSpeed", 1f);
+            }
+
+            controladorMovimiento.enabled = !bloquear; // LA MAGIA
         }
 
-        // Si desbloqueamos, asegurarnos de que no quede un salto guardado
         if (!bloquear && _input != null)
         {
             _input.jump = false;
         }
     }
+
     public void ReiniciarNivel()
     {
-        // 1. Descongelar el tiempo (CRUCIAL para que no se quede tieso)
         Time.timeScale = 1f;
-
-        // 2. Cargar la escena actual de nuevo
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
@@ -105,12 +107,8 @@ public class EstadisticasJugador : MonoBehaviour
     {
         if (panelDerrota != null) panelDerrota.SetActive(true);
         Time.timeScale = 0f;
-
-        // Soltar mouse para poder reiniciar
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
-        // Bloquear controles para que no se mueva el cadáver
         BloquearMovimiento(true);
     }
 }
