@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement; // Para recargar la escena
 using TMPro; // Para usar TMP_Text
 
 public class CronometroLaberinto : MonoBehaviour
@@ -62,6 +63,21 @@ public class CronometroLaberinto : MonoBehaviour
                     movimiento.enabled = false;
                 }
             }
+
+            // ✅ Mostrar cursor para poder usar botones
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
+    }
+
+    // Método para el botón Reintentar
+    public void Reintentar()
+    {
+        // Recarga la escena actual
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        // Opcional: volver a bloquear cursor al reiniciar
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 }
