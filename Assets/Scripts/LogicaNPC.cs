@@ -3,39 +3,43 @@ using TMPro;
 
 public class LogicaNPC : MonoBehaviour
 {
+    [Header("--- CONEXIÓN CON IA ---")]
+    public GeminiChat cerebroIA;
+    public TMP_Text textoDondeHablaLaIA;
+
     [Header("--- UI GENERAL ---")]
     public GameObject panelDialogo;
     public GameObject contenedorBotones;
-    public GameObject textoPreguntaInicial; // Opcional
+    public GameObject textoPreguntaInicial;
 
-    [Header("--- OBJETOS DE RESPUESTA ---")]
-    public GameObject objetoRespuestaA;
-    public GameObject objetoRespuestaB;
+    [Header("--- JUGADOR (CAMBIO IMPORTANTE) ---")]
+    // Antes era: public MovimientoJugador scriptJugador;
+    // Ahora es:
+    public EstadisticasJugador scriptJugador;
 
-    [Header("--- JUGADOR ---")]
-    public MovimientoJugador scriptJugador;
-
-    [Header("--- CONFIGURACIÓN ---")]
+    [Header("--- CONFIGURACIÓN DE PREGUNTAS ---")]
+    [TextArea] public string preguntaParaOpcionA = "Disculpa, ¿dónde dejo estas muestras biológicas?";
     public float penalizacionA = 10f;
+
+    [TextArea] public string preguntaParaOpcionB = "Ehh... ¿el edificio de... salud?";
     public float penalizacionB = 15f;
 
     // ESTADOS INTERNOS
     private bool jugadorCerca = false;
-    private bool menuAbierto = false;       // Estamos eligiendo A o B
-    private bool mostrandoResultado = false; // Ya elegimos y estamos leyendo la respuesta
+    private bool menuAbierto = false;
+    private bool mostrandoResultado = false;
 
     void Update()
     {
-        // 1. ABRIR EL MENÚ (Solo si no estamos haciendo nada más)
+        // 1. ABRIR EL MENÚ
         if (jugadorCerca && Input.GetKeyDown(KeyCode.E) && !menuAbierto && !mostrandoResultado)
         {
             AbrirMenu();
         }
 
-        // 2. CERRAR EL RESULTADO CON ESPACIO (Lo que pediste)
+        // 2. CERRAR EL RESULTADO CON ESPACIO
         if (mostrandoResultado)
         {
-            // Si presionas Espacio O Enter, se cierra al instante
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.E))
             {
                 CerrarTodo();
@@ -47,51 +51,54 @@ public class LogicaNPC : MonoBehaviour
     {
         menuAbierto = true;
 
-        // IMPORTANTE: No usamos Time.timeScale = 0.
-        // En su lugar, bloqueamos a Jaime usando la variable que hiciste pública.
+        // --- CAMBIO: USAMOS EL NUEVO SISTEMA DE BLOQUEO ---
         if (scriptJugador != null)
         {
-            scriptJugador.hablando = true; // Jaime deja de caminar, pero respira
-            scriptJugador.GetComponent<Rigidbody>().linearVelocity = Vector3.zero; // Frenado en seco
+            // Llamamos a la función que frena al Starter Assets
+            scriptJugador.BloquearMovimiento(true);
         }
+
+        // --- IMPORTANTE: LIBERAR EL MOUSE ---
+        // Starter Assets atrapa el cursor. Necesitamos soltarlo para dar clic a los botones.
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
 
         panelDialogo.SetActive(true);
         contenedorBotones.SetActive(true);
         if (textoPreguntaInicial != null) textoPreguntaInicial.SetActive(true);
 
-        // Asegurar que las respuestas estén apagadas
-        if (objetoRespuestaA != null) objetoRespuestaA.SetActive(false);
-        if (objetoRespuestaB != null) objetoRespuestaB.SetActive(false);
+        // Limpiamos el texto anterior de la IA
+        if (textoDondeHablaLaIA != null) textoDondeHablaLaIA.text = "";
     }
+
+    // --- INTERACCIÓN CON GEMINI ---
 
     public void SeleccionarOpcionA()
     {
-        EjecutarConsecuencia(objetoRespuestaA, penalizacionA);
+        if (cerebroIA != null)
+            cerebroIA.EnviarPregunta(preguntaParaOpcionA);
+
+        EjecutarConsecuencia(penalizacionA);
     }
 
     public void SeleccionarOpcionB()
     {
-        EjecutarConsecuencia(objetoRespuestaB, penalizacionB);
+        if (cerebroIA != null)
+            cerebroIA.EnviarPregunta(preguntaParaOpcionB);
+
+        EjecutarConsecuencia(penalizacionB);
     }
 
-    void EjecutarConsecuencia(GameObject respuestaAActivar, float daño)
+    void EjecutarConsecuencia(float daño)
     {
-        // Cambiamos de fase: de Menú a Resultado
         menuAbierto = false;
         mostrandoResultado = true;
 
-        // Ocultar botones
         contenedorBotones.SetActive(false);
         if (textoPreguntaInicial != null) textoPreguntaInicial.SetActive(false);
 
-        // Mostrar la respuesta elegida
-        if (respuestaAActivar != null) respuestaAActivar.SetActive(true);
-
-        // Aplicar daño
+        // Aplicamos daño (Esto sigue funcionando igual porque EstadisticasJugador tiene esa variable)
         if (scriptJugador != null) scriptJugador.adaptacionActual -= daño;
-
-        // YA NO usamos Corrutina de tiempo.
-        // Ahora esperamos en el Update() a que presiones Espacio.
     }
 
     void CerrarTodo()
@@ -100,19 +107,26 @@ public class LogicaNPC : MonoBehaviour
         menuAbierto = false;
 
         panelDialogo.SetActive(false);
-        if (objetoRespuestaA != null) objetoRespuestaA.SetActive(false);
-        if (objetoRespuestaB != null) objetoRespuestaB.SetActive(false);
 
-        // Liberamos a Jaime para que camine de nuevo
-        if (scriptJugador != null) scriptJugador.hablando = false;
+        // --- CAMBIO: DESBLOQUEAR ---
+        if (scriptJugador != null)
+        {
+            scriptJugador.BloquearMovimiento(false); // Jaime puede caminar de nuevo
+        }
+
+        // VOLVER A ATRAPAR EL MOUSE (Para poder girar la cámara)
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        // Starter Assets usa el tag "Player" en el objeto padre, así que esto funcionará bien
         if (other.CompareTag("Player"))
         {
             jugadorCerca = true;
-            if (scriptJugador == null) scriptJugador = other.GetComponent<MovimientoJugador>();
+            // Buscamos el nuevo script en el objeto que entró
+            if (scriptJugador == null) scriptJugador = other.GetComponent<EstadisticasJugador>();
         }
     }
 
@@ -121,7 +135,6 @@ public class LogicaNPC : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             jugadorCerca = false;
-            // Si te alejas a media charla, cerramos todo por seguridad
             if (menuAbierto || mostrandoResultado) CerrarTodo();
         }
     }
