@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class IdeaMinigameManager : MonoBehaviour
 {
@@ -19,14 +20,21 @@ public class IdeaMinigameManager : MonoBehaviour
     public int globosNecesarios = 4;
     private int globosActuales = 0;
     private bool esperandoReintento = false;
-
+    private bool juegoGanado = false;
     void Start() { ReiniciarVariables(); }
 
     void Update()
     {
+        // Si perdió y presiona Espacio, reinicia
         if (esperandoReintento && Input.GetKeyDown(KeyCode.Space))
         {
             ReiniciarMinijuego();
+        }
+
+        // 2. Si ganó y presiona Espacio, carga la siguiente escena
+        if (juegoGanado && Input.GetKeyDown(KeyCode.Space))
+        {
+            CargarSiguienteCapitulo();
         }
     }
 
@@ -99,6 +107,13 @@ public class IdeaMinigameManager : MonoBehaviour
     void Victoria()
     {
         panelFinal.SetActive(true);
-        textoFinal.text = "<b><size=140%><color=#2E8B57>¡Lo lograste!</color></size></b>\nNo siempre se puede controlar los pensamientos…\nPero sí se puede elegir qué nos ayuda a seguir.";
+        // 3. Informamos al jugador que puede continuar
+        textoFinal.text = "<b><size=140%><color=#2E8B57>¡Lo lograste!</color></size></b>\nNo siempre se puede controlar los pensamientos…\nPero sí se puede elegir qué nos ayuda a seguir.\n\n<size=30><color=#333333>Presiona ESPACIO para continuar</color></size>";
+        juegoGanado = true;
+    }
+    // 4. Método para realizar el cambio de escena
+    public void CargarSiguienteCapitulo()
+    {
+        SceneManager.LoadScene("Capitulo_02 Mariscal");
     }
 }
