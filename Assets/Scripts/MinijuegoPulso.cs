@@ -30,6 +30,9 @@ public class MinijuegoPulso : MonoBehaviour
     [Header("--- FINAL ---")]
     public GameObject pantallaVictoria;
 
+    // 👇 ESTO ES LO ÚNICO NUEVO EN LAS VARIABLES 👇
+    public GameObject bolsaMuestras; // Arrastra tu objeto 'BolsaConFrascos' aquí
+
     // Variables internas
     private float velocidadActual;
     private int aciertos = 0;
@@ -130,7 +133,7 @@ public class MinijuegoPulso : MonoBehaviour
         float distancia = Mathf.Abs(aguja.anchoredPosition.x - zonaSegura.anchoredPosition.x);
 
         // ¡Usamos el margen generoso!
-        float margenError = zonaSegura.rect.width *1.5f;
+        float margenError = zonaSegura.rect.width * 1.5f;
 
         if (distancia < margenError)
         {
@@ -171,6 +174,13 @@ public class MinijuegoPulso : MonoBehaviour
         if (pantallaVictoria != null)
         {
             pantallaVictoria.SetActive(true);
+        }
+
+        // 👇 Y ESTO ES LO ÚNICO NUEVO EN LA LÓGICA 👇
+        // Desaparecer la bolsa de la mano de Jaime
+        if (bolsaMuestras != null)
+        {
+            bolsaMuestras.SetActive(false);
         }
 
         // Desbloquear a Jaime
