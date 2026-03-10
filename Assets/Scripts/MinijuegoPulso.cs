@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using TMPro; // <--- NUEVO: Necesario para modificar textos en pantalla
+using TMPro;
 
 public class MinijuegoPulso : MonoBehaviour
 {
@@ -13,13 +13,13 @@ public class MinijuegoPulso : MonoBehaviour
     [Header("--- SISTEMA DE VIDAS ---")]
     public int vidasMaximas = 5;
     private int vidasActuales;
-    public TMP_Text textoVidas; // <--- NUEVO: La conexión a tu texto de Unity
+    public TMP_Text textoVidas;
 
     [Header("--- LÍMITES DEL BRAZO (Ajusta aquí) ---")]
     public float limiteMovimiento = 300f;
     public float limiteZonaVerde = 250f;
 
-    [Header("--- ANIMACIÓN PINCHAZO (Ajusta Diagonal) ---")]
+    [Header("--- ANIMACIÓN PINCHAZO ---")]
     public float avanceDerecha = 50f;
     public float avanceArriba = 20f;
     public float tiempoClavada = 0.15f;
@@ -29,9 +29,12 @@ public class MinijuegoPulso : MonoBehaviour
     public RectTransform zonaSegura;
     public GameObject panelCompleto;
 
-    [Header("--- FINAL ---")]
+    [Header("--- FINAL Y TRANSICIÓN ---")]
     public GameObject pantallaVictoria;
     public GameObject bolsaMuestras;
+    public float tiempoEsperaVictoria = 3f;
+    // 👇 ESTA ES LA NUEVA MAGIA A PRUEBA DE FALLOS 👇
+    public string nombreSiguienteEscena = "Capitulo_03 Castro";
 
     // Variables internas
     private float velocidadActual;
@@ -53,7 +56,7 @@ public class MinijuegoPulso : MonoBehaviour
         manosArriba = false;
         estaPinchando = false;
 
-        ActualizarTextoVidas(); // <--- Muestra las vidas desde el segundo cero
+        ActualizarTextoVidas();
         MoverZonaSegura();
     }
 
@@ -121,7 +124,6 @@ public class MinijuegoPulso : MonoBehaviour
         if (distancia < margenError)
         {
             aciertos++;
-            Debug.Log("✅ Acierto: " + aciertos);
 
             if (aciertos >= aciertosNecesarios)
             {
@@ -136,8 +138,7 @@ public class MinijuegoPulso : MonoBehaviour
         else
         {
             vidasActuales--;
-            ActualizarTextoVidas(); // <--- Actualiza el número en pantalla al fallar
-            Debug.Log("❌ FALLASTE - Vidas restantes: " + vidasActuales);
+            ActualizarTextoVidas();
 
             if (vidasActuales <= 0)
             {
@@ -157,7 +158,6 @@ public class MinijuegoPulso : MonoBehaviour
         zonaSegura.anchoredPosition = new Vector2(nuevaPosX, zonaSegura.anchoredPosition.y);
     }
 
-    // --- NUEVA FUNCIÓN PARA CAMBIAR EL TEXTO ---
     void ActualizarTextoVidas()
     {
         if (textoVidas != null)
@@ -168,7 +168,6 @@ public class MinijuegoPulso : MonoBehaviour
 
     void GanarJuego()
     {
-        Debug.Log("🏆 ¡PRUEBA COMPLETADA!");
         panelCompleto.SetActive(false);
 
         if (pantallaVictoria != null)
@@ -181,22 +180,20 @@ public class MinijuegoPulso : MonoBehaviour
             bolsaMuestras.SetActive(false);
         }
 
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
-        {
-            EstadisticasJugador stats = player.GetComponent<EstadisticasJugador>();
-            if (stats != null) stats.BloquearMovimiento(false);
-        }
+        StartCoroutine(TransicionSiguienteEscena());
+    }
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+    // --- AHORA BUSCAMOS LA ESCENA POR SU NOMBRE ---
+    IEnumerator TransicionSiguienteEscena()
+    {
+        yield return new WaitForSeconds(tiempoEsperaVictoria);
+        SceneManager.LoadScene(nombreSiguienteEscena);
     }
 
     void PerderJuego()
     {
-        Debug.Log("💀 GAME OVER - Cero vidas. Reiniciando nivel...");
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // <-- También modificado para recargar por nombre
     }
 }

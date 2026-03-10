@@ -6,14 +6,20 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Capitulo_02 Mariscal.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/MenuPrincipal.unity
+    guid: 19c3968567c90824d97fe9eb69dc7515
   - enabled: 1
-    path: Assets/Scenes/Outro.unity
-    guid: 322f73f7d8cc509499bee2c07321745b
+    path: Assets/Scenes/Capitulo_02 Mariscal.unity
+    guid: b148820778a3f004da7f73fe9e6bf711
+  - enabled: 1
+    path: Assets/Scenes/Capitulo_03 Castro.unity
+    guid: 6d42612dc08826643a6efa366948926c
   - enabled: 1
     path: Assets/Scenes/Intro.unity
     guid: 3c9e0a48ff280c94d8f62fcb904dcef7
+  - enabled: 1
+    path: Assets/Scenes/Capitulo_01 Taipe.unity
+    guid: ba89059339e434e49afd485b10177ef7
   - enabled: 1
     path: Assets/Scenes/Capitulo_04_Psicologia.unity
     guid: 379be682aad60624f9227a87678474a1
@@ -39,8 +45,8 @@ EditorBuildSettings:
     path: Assets/Scenes/ConexionCapitulos.unity
     guid: ef4bf2697e112cc44bf476a3aafed761
   - enabled: 1
-    path: Assets/Scenes/Capitulo_03 Castro.unity
-    guid: 6d42612dc08826643a6efa366948926c
+    path: Assets/Scenes/Outro.unity
+    guid: 322f73f7d8cc509499bee2c07321745b
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 9e7be553448fa2546aea5752021cbcf7, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
