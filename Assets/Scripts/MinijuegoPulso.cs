@@ -1,6 +1,8 @@
-﻿using System.Collections; // Necesario para la animación (Corrutina)
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using TMPro; // <--- NUEVO: Necesario para modificar textos en pantalla
 
 public class MinijuegoPulso : MonoBehaviour
 {
@@ -8,38 +10,34 @@ public class MinijuegoPulso : MonoBehaviour
     public float velocidadInicial = 200f;
     public int aciertosNecesarios = 3;
 
+    [Header("--- SISTEMA DE VIDAS ---")]
+    public int vidasMaximas = 5;
+    private int vidasActuales;
+    public TMP_Text textoVidas; // <--- NUEVO: La conexión a tu texto de Unity
+
     [Header("--- LÍMITES DEL BRAZO (Ajusta aquí) ---")]
-    [Tooltip("Hasta qué número X llega la jeringa antes de rebotar")]
     public float limiteMovimiento = 300f;
-    [Tooltip("Rango máximo donde puede aparecer la zona verde (-X a +X)")]
     public float limiteZonaVerde = 250f;
 
     [Header("--- ANIMACIÓN PINCHAZO (Ajusta Diagonal) ---")]
-    [Tooltip("Cuantos pixeles se mueve a la DERECHA (+X) al pinchar")]
-    public float avanceDerecha = 50f; // <-- AJUSTA ESTO EN EL INSPECTOR
-    [Tooltip("Cuantos pixeles se mueve hacia ARRIBA (+Y) al pinchar")]
-    public float avanceArriba = 20f;  // <-- AJUSTA ESTO EN EL INSPECTOR
-    [Tooltip("Tiempo (segundos) que la aguja se queda clavada")]
+    public float avanceDerecha = 50f;
+    public float avanceArriba = 20f;
     public float tiempoClavada = 0.15f;
 
     [Header("--- CONEXIONES UI ---")]
-    public RectTransform aguja;      // Arrastra tu inyección aquí
-    public RectTransform zonaSegura; // Arrastra tu objetivo rojo/verde aquí
-    public GameObject panelCompleto; // El objeto padre que apaga todo al ganar
+    public RectTransform aguja;
+    public RectTransform zonaSegura;
+    public GameObject panelCompleto;
 
     [Header("--- FINAL ---")]
     public GameObject pantallaVictoria;
-
-    // 👇 ESTO ES LO ÚNICO NUEVO EN LAS VARIABLES 👇
-    public GameObject bolsaMuestras; // Arrastra tu objeto 'BolsaConFrascos' aquí
+    public GameObject bolsaMuestras;
 
     // Variables internas
     private float velocidadActual;
     private int aciertos = 0;
     private bool moviendoDerecha = true;
     private bool manosArriba = false;
-
-    // VARIABLE MAGICA PARA LA ANIMACIÓN
     private bool estaPinchando = false;
 
     void Start()
@@ -49,20 +47,20 @@ public class MinijuegoPulso : MonoBehaviour
 
     void OnEnable()
     {
-        // RESET TOTAL AL APARECER
         aciertos = 0;
+        vidasActuales = vidasMaximas;
         velocidadActual = velocidadInicial;
         manosArriba = false;
         estaPinchando = false;
+
+        ActualizarTextoVidas(); // <--- Muestra las vidas desde el segundo cero
         MoverZonaSegura();
     }
 
     void Update()
     {
-        // 1. Si el panel está apagado o estamos pinchando, no hacer nada
         if (panelCompleto.activeInHierarchy == false) return;
 
-        // 2. Filtro de seguridad (esperar a que suelte Space/Click)
         if (manosArriba == false)
         {
             if (!Input.GetKey(KeyCode.Space) && !Input.GetMouseButton(0))
@@ -72,16 +70,13 @@ public class MinijuegoPulso : MonoBehaviour
             return;
         }
 
-        // 3. Solo se mueve de lado a lado si NO está en medio del pinchazo
         if (!estaPinchando)
         {
             MoverAguja();
         }
 
-        // 4. Detectar el intento de acierto (solo si no estamos ya pinchando)
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0)) && !estaPinchando)
         {
-            // INICIAMOS LA PELÍCULA DE CÓDIGO (ANIMACIÓN)
             StartCoroutine(AnimacionPinchazoDiagonal());
         }
     }
@@ -100,44 +95,31 @@ public class MinijuegoPulso : MonoBehaviour
         }
     }
 
-    // --- LA NUEVA MAGIA VISUAL: EL EFECTO DIAGONAL SATISFACTORIO ---
     IEnumerator AnimacionPinchazoDiagonal()
     {
-        estaPinchando = true; // Congelamos el movimiento lateral
+        estaPinchando = true;
 
-        // 1. Guardamos la posición original completa (Vector2 es mejor)
         Vector2 posicionOriginal = aguja.anchoredPosition;
-
-        // 2. Calculamos el vector diagonal de movimiento (derecha y arriba)
-        // (Al sumar offsetDiagonal a posicionOriginal, la movemos en diagonal)
         Vector2 offsetDiagonal = new Vector2(avanceDerecha, avanceArriba);
         Vector2 posicionEnterrada = posicionOriginal + offsetDiagonal;
 
-        // 3. Movemos la inyección de golpe (el "pincho" satisfactorio)
         aguja.anchoredPosition = posicionEnterrada;
 
-        // 4. Revisamos si atinaste o fallaste mientras está visualmente "adentro"
         VerificarAcierto();
 
-        // 5. Esperamos para que el jugador la vea clavada
         yield return new WaitForSeconds(tiempoClavada);
 
-        // 6. La devolvemos suavemente (o de golpe) a su posición original completa
         aguja.anchoredPosition = posicionOriginal;
-
-        estaPinchando = false; // Descongelamos el movimiento lateral
+        estaPinchando = false;
     }
 
     void VerificarAcierto()
     {
         float distancia = Mathf.Abs(aguja.anchoredPosition.x - zonaSegura.anchoredPosition.x);
-
-        // ¡Usamos el margen generoso!
         float margenError = zonaSegura.rect.width * 1.5f;
 
         if (distancia < margenError)
         {
-            // ACIERTO
             aciertos++;
             Debug.Log("✅ Acierto: " + aciertos);
 
@@ -147,16 +129,25 @@ public class MinijuegoPulso : MonoBehaviour
             }
             else
             {
-                velocidadActual += 100f; // Más rápido
-                MoverZonaSegura();       // Mover verde
+                velocidadActual += 100f;
+                MoverZonaSegura();
             }
         }
         else
         {
-            // FALLO
-            Debug.Log("❌ FALLASTE - Reiniciando");
-            aciertos = 0;
-            velocidadActual = velocidadInicial;
+            vidasActuales--;
+            ActualizarTextoVidas(); // <--- Actualiza el número en pantalla al fallar
+            Debug.Log("❌ FALLASTE - Vidas restantes: " + vidasActuales);
+
+            if (vidasActuales <= 0)
+            {
+                PerderJuego();
+            }
+            else
+            {
+                aciertos = 0;
+                velocidadActual = velocidadInicial;
+            }
         }
     }
 
@@ -166,24 +157,30 @@ public class MinijuegoPulso : MonoBehaviour
         zonaSegura.anchoredPosition = new Vector2(nuevaPosX, zonaSegura.anchoredPosition.y);
     }
 
+    // --- NUEVA FUNCIÓN PARA CAMBIAR EL TEXTO ---
+    void ActualizarTextoVidas()
+    {
+        if (textoVidas != null)
+        {
+            textoVidas.text = "Vidas: " + vidasActuales;
+        }
+    }
+
     void GanarJuego()
     {
         Debug.Log("🏆 ¡PRUEBA COMPLETADA!");
-        panelCompleto.SetActive(false); // Cierra el minijuego completo
+        panelCompleto.SetActive(false);
 
         if (pantallaVictoria != null)
         {
             pantallaVictoria.SetActive(true);
         }
 
-        // 👇 Y ESTO ES LO ÚNICO NUEVO EN LA LÓGICA 👇
-        // Desaparecer la bolsa de la mano de Jaime
         if (bolsaMuestras != null)
         {
             bolsaMuestras.SetActive(false);
         }
 
-        // Desbloquear a Jaime
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -193,5 +190,13 @@ public class MinijuegoPulso : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    void PerderJuego()
+    {
+        Debug.Log("💀 GAME OVER - Cero vidas. Reiniciando nivel...");
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
