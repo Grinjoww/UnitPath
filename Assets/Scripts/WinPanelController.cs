@@ -5,6 +5,11 @@ public class WinPanelController : MonoBehaviour
 {
     public void ContinuarJuego()
     {
-        SceneManager.LoadScene("WinScene"); // nombre exacto
+        // Ocultar el cursor antes de cambiar de escena
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        // Cargar la escena de victoria
+        SceneManager.LoadScene("WinScene");
     }
 }
