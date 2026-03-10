@@ -3754,7 +3754,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '"ESPACIO" para continuar'
+  m_text: '"ENTER" para continuar'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 49c730e644d6d934a8327641f49cca9f, type: 2}
   m_sharedMaterial: {fileID: 910930821560759413, guid: 49c730e644d6d934a8327641f49cca9f, type: 2}
