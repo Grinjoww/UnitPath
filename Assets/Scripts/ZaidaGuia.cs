@@ -8,8 +8,10 @@ public class ZaidaGuia : MonoBehaviour
     public TMP_Text textoDialogo;
 
     [Header("--- JUGADOR (ARRASTRA AQUÍ A TU PLAYER) ---")]
-    // CAMBIO CLAVE: Lo hacemos público para arrastrarlo manual, igual que en LogicaNPC
     public EstadisticasJugador statsJugador;
+
+    [Header("--- MOVIMIENTO DE ZAIDA ---")]
+    public MovimientoZaida scriptMovimiento; // <--- 1. ¡NUEVA CASILLA!
 
     [Header("--- LOS DIÁLOGOS ---")]
     [TextArea(3, 5)]
@@ -111,6 +113,12 @@ public class ZaidaGuia : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        // --- 2. ¡AQUÍ ESTÁ LA LLAVE DE ENCENDIDO PARA ZAIDA! ---
+        if (scriptMovimiento != null)
+        {
+            scriptMovimiento.IniciarViaje();
+        }
     }
 
     void CancelarConversacion()
