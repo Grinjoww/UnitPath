@@ -5,6 +5,7 @@ using TMPro;
 public class EmotionChoice : MonoBehaviour
 {
     public GameObject panelUI;
+    public TextMeshProUGUI textoMision;
 
     [Header("Elementos UI iniciales")]
     public GameObject textMonologo;
@@ -52,6 +53,11 @@ public class EmotionChoice : MonoBehaviour
     void HideUI()
     {
         panelUI.SetActive(false);
+
+        textoMision.text = "<color=#FFCC00><b>NUEVO OBJETIVO:</b></color>\nHablar con Josué";
+
+        if (playerInput != null)
+            playerInput.enabled = true;
 
         if (playerInput != null)
             playerInput.enabled = true;
