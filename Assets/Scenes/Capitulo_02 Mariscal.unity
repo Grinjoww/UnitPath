@@ -5973,8 +5973,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb6b2a20e8e5204fb8a68f45be73af7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinijuegoPulso
-  velocidadInicial: 100
-  aciertosNecesarios: 3
+  velocidadInicial: 80
+  aciertosNecesarios: 2
   vidasMaximas: 10
   textoVidas: {fileID: 1885766505}
   limiteMovimiento: 150
@@ -5987,6 +5987,8 @@ MonoBehaviour:
   panelCompleto: {fileID: 32041460}
   pantallaVictoria: {fileID: 383123225}
   bolsaMuestras: {fileID: 442587486}
+  tiempoEsperaVictoria: 3
+  nombreSiguienteEscena: Capitulo_03 Castro
 --- !u!4 &1311648710
 Transform:
   m_ObjectHideFlags: 0

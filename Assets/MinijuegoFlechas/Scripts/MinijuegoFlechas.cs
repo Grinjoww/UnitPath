@@ -148,12 +148,16 @@ public class MinijuegoFlechas : MonoBehaviour
 
     void VerificarZona(int dir)
     {
+        Debug.Log("Tecla presionada dir: " + dir + " | Flechas activas: " + flechasActivas.Count);
         // ⭐ Declarar UNA sola vez aquí, afuera del for
         SistemaEmojis sistemaEmojis = FindFirstObjectByType<SistemaEmojis>();
 
         for (int i = flechasActivas.Count - 1; i >= 0; i--)
+
         {
             Flecha f = flechasActivas[i].GetComponent<Flecha>();
+            float distancia = f.DistanciaAZona();
+            Debug.Log("Flecha " + i + " dir: " + f.direccion + " | distancia: " + distancia + " | tolerancia: " + tolerancia);
             if (f.direccion == dir && f.DistanciaAZona() < tolerancia)
             {
                 // ⭐ Efecto visual de acierto
@@ -247,6 +251,7 @@ public class MinijuegoFlechas : MonoBehaviour
     // ⭐ NUEVO: Parpadeo de zona
     IEnumerator ParpadeoZona(RectTransform zona, Color color)
     {
+        if (zona == null) yield break;
         Image img = zona.GetComponent<Image>();
         if (img == null) yield break;
 
@@ -256,13 +261,17 @@ public class MinijuegoFlechas : MonoBehaviour
 
         while (tiempo < duracion)
         {
+            // Verificar cada frame que sigue existiendo
+            if (img == null || zona == null) yield break;
+
             tiempo += Time.deltaTime;
             float progreso = tiempo / duracion;
             img.color = Color.Lerp(color, colorOriginal, progreso);
             yield return null;
         }
 
-        img.color = colorOriginal;
+        if (img != null)
+            img.color = colorOriginal;
     }
 
     // ⭐ NUEVO: Animar zona presionada

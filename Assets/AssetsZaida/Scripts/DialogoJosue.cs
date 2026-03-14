@@ -48,7 +48,7 @@ public class DialogoJosue : MonoBehaviour
         {
             IniciarDialogo();
         }
-        else if (dialogoActivo && !panelOpciones.activeSelf && Input.GetKeyDown(KeyCode.E))
+        else if (dialogoActivo && !panelOpciones.activeSelf && Input.GetKeyDown(KeyCode.Return))
         {
             AvanzarDialogo();
         }
