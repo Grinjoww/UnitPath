@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
+
 [System.Serializable]
 public class OpcionDialogo
 {
@@ -39,6 +40,7 @@ public class SistemaDialogosV2 : MonoBehaviour
 
     [Header("Velocidad")]
     public float velocidadTexto = 0.05f;
+    private StarterAssets.ThirdPersonController playerController;
 
     private Dialogo dialogoActual;
     private int indiceLinea = 0;
@@ -56,57 +58,45 @@ public class SistemaDialogosV2 : MonoBehaviour
         if (panelOpciones != null)
             panelOpciones.SetActive(false);
 
-        if (botonSiguiente != null)
-            botonSiguiente.onClick.AddListener(SiguienteLinea);
-
-        for (int i = 0; i < botonesOpciones.Length; i++)
-        {
-            int indice = i;
-            botonesOpciones[i].onClick.AddListener(() => SeleccionarOpcion(indice));
-        }
+        playerController = FindFirstObjectByType<StarterAssets.ThirdPersonController>();
     }
-
     void Update()
     {
         if (dialogoActual != null)
         {
-            if (!mostrandoOpciones && Input.GetKeyDown(KeyCode.Return))
+            // ⭐ Bloquear salto mientras hay diálogo
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                SiguienteLinea();
-            }
+                Input.ResetInputAxes(); // Resetear input
 
-            if (mostrandoOpciones)
-            {
-                if (Input.GetKeyDown(KeyCode.Alpha1) && dialogoActual.opciones.Length > 0)
-                    SeleccionarOpcion(0);
-
-                if (Input.GetKeyDown(KeyCode.Alpha2) && dialogoActual.opciones.Length > 1)
-                    SeleccionarOpcion(1);
-
-                if (Input.GetKeyDown(KeyCode.Alpha3) && dialogoActual.opciones.Length > 2)
-                    SeleccionarOpcion(2);
-
-                if (Input.GetKeyDown(KeyCode.Alpha4) && dialogoActual.opciones.Length > 3)
-                    SeleccionarOpcion(3);
+                if (!mostrandoOpciones)
+                {
+                    SiguienteLinea();
+                }
             }
         }
     }
-
-    // ⭐ CAMBIO: Ahora recibe el NPC que llama
+  
     public void IniciarDialogo(Dialogo dialogo, NPC npc = null)
     {
         dialogoActual = dialogo;
         indiceLinea = 0;
         respuestaActual = null;
         mostrandoOpciones = false;
-        npcActual = npc; // ⭐ Guardar el NPC
+        npcActual = npc;
 
         if (panelDialogo != null)
             panelDialogo.SetActive(true);
 
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        // ⭐ Desactivar COMPLETAMENTE el player
+        if (playerController != null)
+            playerController.enabled = false;
+
         MostrarLinea();
     }
-
     void MostrarLinea()
     {
         if (dialogoActual == null)
@@ -191,6 +181,7 @@ public class SistemaDialogosV2 : MonoBehaviour
             {
                 botonesOpciones[i].gameObject.SetActive(true);
                 textosOpciones[i].text = dialogoActual.opciones[i].texto;
+                Debug.Log("Botón " + i + " visible y clickeable");
             }
             else
             {
@@ -199,9 +190,9 @@ public class SistemaDialogosV2 : MonoBehaviour
         }
 
         panelOpciones.SetActive(true);
+        panelOpciones.transform.SetAsLastSibling();
     }
-
-    void SeleccionarOpcion(int indice)
+    public void SeleccionarOpcion(int indice)
     {
         if (indice >= dialogoActual.opciones.Length)
             return;
@@ -285,11 +276,16 @@ public class SistemaDialogosV2 : MonoBehaviour
         respuestaActual = null;
         dialogoActual = null;
 
-        // ⭐ Mostrar "Presiona E" del NPC que inició el diálogo
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        // ⭐ Reactivar player
+        if (playerController != null)
+            playerController.enabled = true;
+
         if (npcActual != null && npcActual.textoInteraccion != null)
             npcActual.textoInteraccion.gameObject.SetActive(true);
     }
-
     public void CerrarDialogo()
     {
         TerminarDialogo();

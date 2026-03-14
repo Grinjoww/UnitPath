@@ -392,6 +392,10 @@ public class MinijuegoFlechas : MonoBehaviour
 
         if (panelGameOver != null)
             panelGameOver.SetActive(true);
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        var canvasHUD = GameObject.Find("CanvasHUD");
+        if (canvasHUD != null) canvasHUD.SetActive(false);
     }
 
     public void Reintentar()
@@ -412,6 +416,8 @@ public class MinijuegoFlechas : MonoBehaviour
         SistemaEmojis sistemaEmojis = FindFirstObjectByType<SistemaEmojis>();
         if (sistemaEmojis != null)
             sistemaEmojis.Resetear();
+        var canvasHUD = GameObject.Find("CanvasHUD");
+        if (canvasHUD != null) canvasHUD.SetActive(true);
     }
 
     public void Salir()
@@ -424,6 +430,8 @@ public class MinijuegoFlechas : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         gameObject.transform.parent.gameObject.SetActive(false);
+        var canvasHUD = GameObject.Find("CanvasHUD");
+        if (canvasHUD != null) canvasHUD.SetActive(true);
     }
 
     // ⭐ NUEVO: Reproducir sonido
