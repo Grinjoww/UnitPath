@@ -13,6 +13,10 @@ public class DialogoJosue : MonoBehaviour
     public GameObject textoPresioneE;
     public TextMeshProUGUI[] textosOpciones;
     public TextMeshProUGUI textoMision;
+    public Image imagenPerfil; // El componente Image que está en el panel
+    public Sprite miSprite;
+    public TextMeshProUGUI textoNombreUI; // <--- NUEVA: Referencia al componente de texto del nombre
+    public string nombreNPC;
 
     [Header("Jugador")]
     public GameObject jugador;
@@ -48,7 +52,7 @@ public class DialogoJosue : MonoBehaviour
         {
             IniciarDialogo();
         }
-        else if (dialogoActivo && !panelOpciones.activeSelf && Input.GetKeyDown(KeyCode.Return))
+        else if (dialogoActivo && !panelOpciones.activeSelf && Input.GetKeyDown(KeyCode.Space))
         {
             AvanzarDialogo();
         }
@@ -56,6 +60,8 @@ public class DialogoJosue : MonoBehaviour
 
     void IniciarDialogo()
     {
+        imagenPerfil.sprite = miSprite; // <--- ASIGNA LA IMAGEN AQUÍ
+        textoNombreUI.text = nombreNPC;
         estadoDialogo = 0;
         dialogoActivo = true;
         textoPresioneE.SetActive(false);
@@ -79,32 +85,32 @@ public class DialogoJosue : MonoBehaviour
         switch (estadoDialogo)
         {
             case 0:
-                textoDialogo.text = "Josué: Oye, ¿qué haces todavía aquí?";
+                textoDialogo.text = "Oye, ¿qué haces todavía aquí?";
                 break;
             case 1:
-                textoDialogo.text = "Jugador: <color=#FFFFCC><i>Nada… dando una vuelta antes de irme. \nCreo que voy a extrañar todo esto, ¿Y tú?</i></color>";
+                textoDialogo.text = "<i>Nada… dando una vuelta antes de irme. \nCreo que voy a extrañar todo esto, ¿Y tú?</i>";
                 break;
             case 2:
-                textoDialogo.text = "Josué: Pienso lo mismo. \nTe cuento que me aceptaron en una universidad fuera de la ciudad.Todos me dicen que debería estar feliz y emocionado, pero no es tan simple. Estoy contento, sí... pero también un poco asustado, la verdad.";
+                textoDialogo.text = "Pienso lo mismo. \nTe cuento que me aceptaron en una universidad fuera de la ciudad.Todos me dicen que debería estar feliz y emocionado, pero no es tan simple. Estoy contento, sí... pero también un poco asustado, la verdad.";
                 break;
             case 3:
                 ConfigurarPrimeraEleccion();
                 break;
             case 5:
-                textoDialogo.text = "Josué: Me emociona la idea de irme, conocer gente nueva y todo eso… Pero también pienso en la sensación de despedirme de la vida que hice aquí. \nSupongo que ahora me toca empezar desde cero.";
+                textoDialogo.text = "Me emociona la idea de irme, conocer gente nueva y todo eso… Pero también pienso en la sensación de despedirme de la vida que hice aquí. \nSupongo que ahora me toca empezar desde cero.";
                 break;
             case 6:
                 ConfigurarSegundaEleccion();
                 break;
             case 8:
-                textoDialogo.text = "Josué: Creo que nadie sale de aquí sabiendo realmente qué viene después. Supongo que solo nos queda ir descubriéndolo.";
+                textoDialogo.text = "Creo que nadie sale de aquí sabiendo realmente qué viene después. Supongo que solo nos queda ir descubriéndolo.";
                 break;
             case 9:
-                textoDialogo.text = "Jugador: <color=#FFFFCC><i>Tú tranquilo… de alguna forma vamos a aprender en el camino. Por ahora me despido. ¡Cuídate!</i></color>";
+                textoDialogo.text = "<i>Tú tranquilo… de alguna forma vamos a aprender en el camino. Por ahora me despido.</i>";
                 break;
             case 10:
                 // MONÓLOGO FINAL
-                textoDialogo.text = "<color=#FFFFCC><i>“Creo que debería despedirme de la profe Marta, es muy sabia y la aprecio mucho, ¿Dónde estará?”</i></color>";
+                textoDialogo.text = "<i>Creo que debería despedirme de la profe Marta, es muy sabia y la aprecio mucho, ¿Dónde estará?</i>";
                 break;
             case 11:
                 FinalizarDialogo();
@@ -121,9 +127,9 @@ public class DialogoJosue : MonoBehaviour
         textosOpciones[1].text = "Sí... creo que a cualquiera le pasaría.";
         textosOpciones[2].text = "Hoy yo también me siento un poco raro.";
 
-        AsignarBotones(() => SeleccionarRespuesta("Josué: Sí… nadie te dice esa parte.", 4),
-                       () => SeleccionarRespuesta("Josué: Eso mismo pienso, pero cuando te toca vivirlo se siente distinto.", 4),
-                       () => SeleccionarRespuesta("Josué: ¿Ves? Entonces no soy el único que se siente así", 4));
+        AsignarBotones(() => SeleccionarRespuesta("Sí… nadie te dice esa parte.", 4),
+                       () => SeleccionarRespuesta("Eso mismo pienso, pero cuando te toca vivirlo se siente distinto.", 4),
+                       () => SeleccionarRespuesta("¿Ves? Entonces no soy el único que se siente así", 4));
     }
 
     void ConfigurarSegundaEleccion()
@@ -135,9 +141,9 @@ public class DialogoJosue : MonoBehaviour
         textosOpciones[1].text = "Debe dar un poco de miedo empezar así.";
         textosOpciones[2].text = "Al menos es un camino que tú elegiste.";
 
-        AsignarBotones(() => SeleccionarRespuesta("Josué: Ojalá. Me gustaría pensar que sí.", 7),
-                       () => SeleccionarRespuesta("Josué: Sí… bastante, pero imagino que es parte del proceso.", 7),
-                       () => SeleccionarRespuesta("Josué: Sí, pensarlo así me da un poco de calma.", 7));
+        AsignarBotones(() => SeleccionarRespuesta("Ojalá. Me gustaría pensar que sí.", 7),
+                       () => SeleccionarRespuesta("Sí… bastante, pero imagino que es parte del proceso.", 7),
+                       () => SeleccionarRespuesta("Sí, pensarlo así me da un poco de calma.", 7));
     }
 
     void AsignarBotones(UnityEngine.Events.UnityAction act1, UnityEngine.Events.UnityAction act2, UnityEngine.Events.UnityAction act3)
