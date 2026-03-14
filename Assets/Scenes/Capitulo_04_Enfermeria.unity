@@ -385,7 +385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   miDialogo:
-    nombre: Enfermera
+    nombre: Doctora
     retrato: {fileID: 21300000, guid: 50df0134d378b134a92f60828930db5c, type: 3}
     lineasInicio:
     - Bienvenido, me alegra  que hayas venido...

@@ -119,7 +119,7 @@ public class MinijuegoPulso : MonoBehaviour
     void VerificarAcierto()
     {
         float distancia = Mathf.Abs(aguja.anchoredPosition.x - zonaSegura.anchoredPosition.x);
-        float margenError = zonaSegura.rect.width * 1.5f;
+        float margenError = zonaSegura.rect.width * 3f;
 
         if (distancia < margenError)
         {
