@@ -11,6 +11,10 @@ public class DialogoMarta : MonoBehaviour
     public GameObject panelOpciones;
     public Button[] botonesOpciones;
     public GameObject textoPresioneE;
+    public Image imagenPerfil;
+    public Sprite miSprite;
+    public TextMeshProUGUI textoNombreUI; // <--- NUEVA: Referencia al componente de texto del nombre
+    public string nombreNPC;
 
     [Header("Jugador")]
     public GameObject jugador;
@@ -30,8 +34,7 @@ public class DialogoMarta : MonoBehaviour
         estadoDialogo = 0;
         dialogoActivo = true;
         gameObject.SetActive(true); // Se asegura de que el NPC o el panel se activen
-        // Aquí puedes llamar a tu función de IniciarDialogo()
-        Debug.Log("Reiniciando conversación con Marta...");
+        
     }
 
     void Start()
@@ -54,7 +57,7 @@ public class DialogoMarta : MonoBehaviour
         {
             IniciarDialogo();
         }
-        else if (dialogoActivo && !panelOpciones.activeSelf && Input.GetKeyDown(KeyCode.E))
+        else if (dialogoActivo && !panelOpciones.activeSelf && Input.GetKeyDown(KeyCode.Space))
         {
             AvanzarDialogo();
         }
@@ -62,6 +65,8 @@ public class DialogoMarta : MonoBehaviour
 
     void IniciarDialogo()
     {
+        imagenPerfil.sprite = miSprite;
+        textoNombreUI.text = nombreNPC;
         estadoDialogo = 0;
         dialogoActivo = true;
         textoPresioneE.SetActive(false);
@@ -84,10 +89,10 @@ public class DialogoMarta : MonoBehaviour
         switch (estadoDialogo)
         {
             case 0:
-                textoDialogo.text = "Profesora: Ah… así que sigues por aquí. Supongo que hoy nadie se quiere ir tan rápido. \nLlegó el último día, ¿no?";
+                textoDialogo.text = "Ah… así que sigues por aquí. Supongo que hoy nadie se quiere ir tan rápido. \nLlegó el último día, ¿no?";
                 break;
             case 1:
-                textoDialogo.text = "Jugador: Hola profe… \nLa verdad no pensé que este día llegaría tan rápido.";
+                textoDialogo.text = "<i>Hola profe… \nLa verdad no pensé que este día llegaría tan rápido.</i>";
                 break;
             case 2:
                 ConfigurarEleccionMarta();
@@ -95,10 +100,10 @@ public class DialogoMarta : MonoBehaviour
             case 4: // Respuesta tras elección
                 break;
             case 5:
-                textoDialogo.text = "Profesora: No tienes que demostrar nada ahora. Esta etapa no se trata de acertar a la primera, sino de ir entendiendo qué te gusta, qué no y qué puedes mejorar. \nCréeme que eso toma tiempo.";
+                textoDialogo.text = "No tienes que demostrar nada ahora. Esta etapa no se trata de acertar a la primera, sino de ir entendiendo qué te gusta, qué no y qué puedes mejorar. \nCréeme que eso toma tiempo.";
                 break;
             case 6:
-                textoDialogo.text = "Profesora: Organiza tus ideas, ve paso a paso. Y recuerda esto: pedir ayuda también es parte de aprender. \nToma, llévate estos globos… para que recuerdes esta etapa con cariño.";
+                textoDialogo.text = "Organiza tus ideas, ve paso a paso. Y recuerda esto: pedir ayuda también es parte de aprender. \nToma, llévate estos globos… para que recuerdes esta etapa con cariño.";
                 break;
             case 7:
                 FinalizarDialogo();
@@ -117,9 +122,9 @@ public class DialogoMarta : MonoBehaviour
         panelOpciones.transform.GetChild(2).GetComponentInChildren<TextMeshProUGUI>().text = "No sé si soy capaz de enfrentar con todo lo que implica crecer.";
 
         AsignarBotones(
-            () => SeleccionarRespuesta("Profesora: Te voy a decir algo con sinceridad: muchos de los que parecen seguros, solo están fingiendo un poco. \nDudar no es algo malo. Significa que te importa decidir bien.", 4),
-            () => SeleccionarRespuesta("Profesora: Equivocarse no es perder tiempo. Es aprender algo que no se aprende leyendo ni escuchando a otros. \nEl tiempo no se pierde cuando estás aprendiendo sobre ti.", 4),
-            () => SeleccionarRespuesta("Profesora: Nadie se siente capaz todo el tiempo. \nLa universidad no es para los que “pueden con todo”, es para los que aprenden en el camino.", 4)
+            () => SeleccionarRespuesta("Te voy a decir algo con sinceridad: muchos de los que parecen seguros, solo están fingiendo un poco. \nDudar no es algo malo. Significa que te importa decidir bien.", 4),
+            () => SeleccionarRespuesta("Equivocarse no es perder tiempo. Es aprender algo que no se aprende leyendo ni escuchando a otros. \nEl tiempo no se pierde cuando estás aprendiendo sobre ti.", 4),
+            () => SeleccionarRespuesta("Nadie se siente capaz todo el tiempo. \nLa universidad no es para los que “pueden con todo”, es para los que aprenden en el camino.", 4)
         );
     }
 
