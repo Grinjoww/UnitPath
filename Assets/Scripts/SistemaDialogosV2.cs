@@ -285,6 +285,15 @@ public class SistemaDialogosV2 : MonoBehaviour
 
         if (npcActual != null && npcActual.textoInteraccion != null)
             npcActual.textoInteraccion.gameObject.SetActive(true);
+        if (MisionHUD.instancia != null && !MisionHUD.instancia.EstaCompleta())
+        {
+            MisionHUD.instancia.ActualizarMision("<color=#57FF57><b>OBJETIVO ACTUALIZADO:</b></color>\nAbandona el lugar");
+            MisionHUD.instancia.CompletarMision();
+
+            // Desactivar luz del NPC
+            GameObject luzNPC = GameObject.Find("LuzNPC");
+            if (luzNPC != null) luzNPC.SetActive(false);
+        }
     }
     public void CerrarDialogo()
     {

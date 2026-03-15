@@ -52,8 +52,8 @@ public class NPC : MonoBehaviour
         {
             if (textoInteraccion != null)
                 textoInteraccion.gameObject.SetActive(false);
-
-            // ⭐ Pasar "this" para que el sistema sepa cuál NPC es
+            GameObject luzNPC = GameObject.Find("LuzNPC");
+            if (luzNPC != null) luzNPC.SetActive(false);
             sistemaDialogos.IniciarDialogo(miDialogo, this);
         }
     }

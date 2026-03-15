@@ -15,6 +15,12 @@ public class PuertaSalidaGeneral : MonoBehaviour
     {
         if (jugadorDentro && Input.GetKeyDown(KeyCode.E))
         {
+            
+            if (MisionHUD.instancia != null && !MisionHUD.instancia.EstaCompleta())
+            {
+                MisionHUD.instancia.MostrarAdvertencia();
+                return;
+            }
             VolverConexion();
         }
     }
@@ -30,19 +36,28 @@ public class PuertaSalidaGeneral : MonoBehaviour
         if (other.CompareTag("Player"))
             jugadorDentro = false;
     }
-
     public void VolverConexion()
     {
-        // Marcar bandera según el capítulo
         switch (nombreEntrada)
         {
             case "Biblioteca":
                 GameManager.capituloBibliotecaCompletado = true;
+                PlayerPrefs.SetInt("Completo_Biblioteca", 1);
                 break;
-                // Aquí añadiremos más casos para otros capítulos
+            case "Enfermeria":
+                GameManager.capituloEnfermeriaCompletado = true;
+                PlayerPrefs.SetInt("Completo_Enfermeria", 1);
+                break;
+            case "Psicologia":
+                GameManager.capituloPsicologiaCompletado = true;
+                PlayerPrefs.SetInt("Completo_Psicologia", 1);
+                break;
+            case "Bienestar":
+                GameManager.capituloBienestarCompletado = true;
+                PlayerPrefs.SetInt("Completo_Bienestar", 1);
+                break;
         }
-
-        // Regresar a la escena central
+        PlayerPrefs.Save();
         SceneManager.LoadScene(escenaConexion);
     }
 }
