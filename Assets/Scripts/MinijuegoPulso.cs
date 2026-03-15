@@ -24,6 +24,10 @@ public class MinijuegoPulso : MonoBehaviour
     public float avanceArriba = 20f;
     public float tiempoClavada = 0.15f;
 
+    [Header("--- AUDIO ---")] // 👇 NUEVA SECCIÓN DE SONIDO 👇
+    public AudioSource audioAmbienteMinijuego;
+    public AudioSource audioDolor;
+
     [Header("--- CONEXIONES UI ---")]
     public RectTransform aguja;
     public RectTransform zonaSegura;
@@ -33,7 +37,6 @@ public class MinijuegoPulso : MonoBehaviour
     public GameObject pantallaVictoria;
     public GameObject bolsaMuestras;
     public float tiempoEsperaVictoria = 3f;
-    // 👇 ESTA ES LA NUEVA MAGIA A PRUEBA DE FALLOS 👇
     public string nombreSiguienteEscena = "Capitulo_03 Castro";
 
     // Variables internas
@@ -46,8 +49,9 @@ public class MinijuegoPulso : MonoBehaviour
     void Start()
     {
         velocidadActual = velocidadInicial;
-    }
 
+    }
+    private bool ambienteSonando = false;
     void OnEnable()
     {
         aciertos = 0;
@@ -55,15 +59,37 @@ public class MinijuegoPulso : MonoBehaviour
         velocidadActual = velocidadInicial;
         manosArriba = false;
         estaPinchando = false;
+        ambienteSonando = false; // Reiniciamos el candado del sonido
 
         ActualizarTextoVidas();
         MoverZonaSegura();
+
+        // ¡QUITAMOS EL AUDIO DE AQUÍ!
     }
+
+    // Puedes borrar el OnDisable() por completo, ya no lo necesitamos.
 
     void Update()
     {
-        if (panelCompleto.activeInHierarchy == false) return;
+        // 1. EL CANDADO VISUAL: Si el panel está apagado, apagamos el sonido y no hacemos nada
+        if (panelCompleto.activeInHierarchy == false)
+        {
+            if (ambienteSonando && audioAmbienteMinijuego != null)
+            {
+                audioAmbienteMinijuego.Stop();
+                ambienteSonando = false;
+            }
+            return;
+        }
 
+        // 2. Si el panel YA ESTÁ VISIBLE y el audio no está sonando, ¡lo encendemos!
+        if (!ambienteSonando && audioAmbienteMinijuego != null)
+        {
+            audioAmbienteMinijuego.Play();
+            ambienteSonando = true;
+        }
+
+        // 3. LA LÓGICA NORMAL DEL JUEGO
         if (manosArriba == false)
         {
             if (!Input.GetKey(KeyCode.Space) && !Input.GetMouseButton(0))
@@ -140,6 +166,9 @@ public class MinijuegoPulso : MonoBehaviour
             vidasActuales--;
             ActualizarTextoVidas();
 
+            // 👇 REPRODUCE EL GRITO/DOLOR CUANDO FALLAS 👇
+            if (audioDolor != null) audioDolor.Play();
+
             if (vidasActuales <= 0)
             {
                 PerderJuego();
@@ -168,22 +197,14 @@ public class MinijuegoPulso : MonoBehaviour
 
     void GanarJuego()
     {
-        panelCompleto.SetActive(false);
+        panelCompleto.SetActive(false); // Esto apagará el panel, y OnDisable apagará el sonido
 
-        if (pantallaVictoria != null)
-        {
-            pantallaVictoria.SetActive(true);
-        }
-
-        if (bolsaMuestras != null)
-        {
-            bolsaMuestras.SetActive(false);
-        }
+        if (pantallaVictoria != null) pantallaVictoria.SetActive(true);
+        if (bolsaMuestras != null) bolsaMuestras.SetActive(false);
 
         StartCoroutine(TransicionSiguienteEscena());
     }
 
-    // --- AHORA BUSCAMOS LA ESCENA POR SU NOMBRE ---
     IEnumerator TransicionSiguienteEscena()
     {
         yield return new WaitForSeconds(tiempoEsperaVictoria);
@@ -194,6 +215,6 @@ public class MinijuegoPulso : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // <-- También modificado para recargar por nombre
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }

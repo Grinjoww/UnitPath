@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 
 public class CinematicaIntro : MonoBehaviour
 {
@@ -9,10 +10,18 @@ public class CinematicaIntro : MonoBehaviour
     public Image imagenVisualizador;
     public TMP_Text textoHistoria;
 
+    // 👇 NUEVA CASILLA PARA TU TEXTO DE "ESPACIO" 👇
+    public GameObject textoContinuar;
+
     [Header("--- LA HISTORIA ---")]
     public Sprite[] imagenes;
     [TextArea(3, 5)]
     public string[] textos;
+
+    [Header("--- EFECTO TEXTO ---")]
+    public float velocidadEscritura = 0.03f;
+    private Coroutine corrutinaEscritura;
+    private bool estaEscribiendo = false;
 
     [Header("--- AUDIO (Opcional) ---")]
     public AudioSource audioLatidos;
@@ -21,38 +30,31 @@ public class CinematicaIntro : MonoBehaviour
     [Header("--- CONEXIÓN AL JUGADOR ---")]
     public EstadisticasJugador statsJugador;
 
-    // 👇 LA MAGIA ESTÁ AQUÍ 👇
-    // Al ser 'static', esta variable no se borra cuando reinicias el nivel al perder.
     public static bool introYaVista = false;
-
     private int indiceActual = 0;
 
     void Start()
     {
-        // 1. REVISAMOS SI YA VIMOS LA INTRO ANTES DE MORIR
         if (introYaVista)
         {
-            // Apagamos el panel negro de inmediato para que veas el juego
             if (panelIntro != null) panelIntro.SetActive(false);
-
-            // Nos aseguramos de que el jugador no esté bloqueado
             if (statsJugador != null) statsJugador.BloquearMovimiento(false);
 
-            // Cortamos la ejecución aquí, no hacemos nada de lo de abajo
+            GestorMisiones gestor = FindFirstObjectByType<GestorMisiones>();
+            if (gestor != null) gestor.ActualizarObjetivo("Encuentra el Centro Médico (Pregunta a los estudiantes).");
+
             return;
         }
 
-        // --- SI ES LA PRIMERA VEZ QUE ABRIMOS EL JUEGO, HACEMOS LO NORMAL ---
-
-        // Mostrar el panel y frenar al jugador
         if (panelIntro != null) panelIntro.SetActive(true);
         if (statsJugador != null) statsJugador.BloquearMovimiento(true);
 
-        // Encender los sonidos de fondo
+        // Nos aseguramos de que el aviso de ESPACIO empiece apagado
+        if (textoContinuar != null) textoContinuar.SetActive(false);
+
         if (audioLatidos != null) audioLatidos.Play();
         if (audioAmbiente != null) audioAmbiente.Play();
 
-        // Mostrar la primera foto y texto
         indiceActual = 0;
         MostrarDiapositiva();
     }
@@ -61,10 +63,22 @@ public class CinematicaIntro : MonoBehaviour
     {
         if (panelIntro != null && !panelIntro.activeInHierarchy) return;
 
-        // Avanzar al presionar Espacio o Clic
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
         {
-            AvanzarHistoria();
+            if (estaEscribiendo)
+            {
+                // Si el jugador da clic para saltar la animación:
+                if (corrutinaEscritura != null) StopCoroutine(corrutinaEscritura);
+                textoHistoria.text = textos[indiceActual];
+                estaEscribiendo = false;
+
+                // Prendemos el aviso de ESPACIO de inmediato
+                if (textoContinuar != null) textoContinuar.SetActive(true);
+            }
+            else
+            {
+                AvanzarHistoria();
+            }
         }
     }
 
@@ -73,8 +87,31 @@ public class CinematicaIntro : MonoBehaviour
         if (indiceActual < imagenes.Length && imagenes[indiceActual] != null)
             imagenVisualizador.sprite = imagenes[indiceActual];
 
+        // Apagamos el aviso de ESPACIO cada vez que cambiamos de foto
+        if (textoContinuar != null) textoContinuar.SetActive(false);
+
         if (indiceActual < textos.Length)
-            textoHistoria.text = textos[indiceActual];
+        {
+            if (corrutinaEscritura != null) StopCoroutine(corrutinaEscritura);
+            corrutinaEscritura = StartCoroutine(EfectoMaquinaDeEscribir(textos[indiceActual]));
+        }
+    }
+
+    IEnumerator EfectoMaquinaDeEscribir(string frase)
+    {
+        estaEscribiendo = true;
+        textoHistoria.text = "";
+
+        foreach (char letra in frase.ToCharArray())
+        {
+            textoHistoria.text += letra;
+            yield return new WaitForSeconds(velocidadEscritura);
+        }
+
+        estaEscribiendo = false;
+
+        // ¡Terminó de escribir sola! Prendemos el aviso de ESPACIO
+        if (textoContinuar != null) textoContinuar.SetActive(true);
     }
 
     void AvanzarHistoria()
@@ -93,17 +130,15 @@ public class CinematicaIntro : MonoBehaviour
 
     void TerminarIntro()
     {
-        // 👇 GUARDAMOS QUE YA LA VIMOS PARA FUTUROS REINICIOS 👇
         introYaVista = true;
 
-        // Apagar el panel y soltar al jugador
         if (panelIntro != null) panelIntro.SetActive(false);
         if (statsJugador != null) statsJugador.BloquearMovimiento(false);
 
-        // Apagar los sonidos de tensión
         if (audioLatidos != null) audioLatidos.Stop();
         if (audioAmbiente != null) audioAmbiente.Stop();
 
-        Debug.Log("🎬 ¡Fin de la intro! A jugar.");
+        GestorMisiones gestor = FindFirstObjectByType<GestorMisiones>();
+        if (gestor != null) gestor.ActualizarObjetivo("Encuentra el Centro Médico (Pregunta a los estudiantes).");
     }
 }

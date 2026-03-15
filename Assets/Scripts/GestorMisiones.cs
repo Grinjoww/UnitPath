@@ -4,23 +4,18 @@ using TMPro;
 public class GestorMisiones : MonoBehaviour
 {
     [Header("--- UI DE MISIONES ---")]
-    public GameObject contenedorMisiones; // <-- NUEVO: Para apagar todo el grupo
+    public GameObject contenedorMisiones;
     public TMP_Text textoMision;
-
-    [Header("--- MISIÓN INICIAL ---")]
-    [TextArea]
-    public string misionAlEmpezar = "Encuentra el dispensario médico (Pregunta a los estudiantes con [E]).";
 
     void Start()
     {
-        // Al darle Play, ponemos la primera misión automáticamente
-        ActualizarObjetivo(misionAlEmpezar);
+        // Apenas cargue el juego (durante tu intro), nos aseguramos de que esto esté invisible
+        if (contenedorMisiones != null) contenedorMisiones.SetActive(false);
     }
 
-    // Esta es la función mágica que otros scripts van a llamar
     public void ActualizarObjetivo(string nuevoTexto)
     {
-        // Si estaba apagado, lo volvemos a prender automáticamente
+        // Cuando llamemos a esta función, se prenderá automáticamente
         if (contenedorMisiones != null) contenedorMisiones.SetActive(true);
 
         if (textoMision != null)
@@ -29,7 +24,6 @@ public class GestorMisiones : MonoBehaviour
         }
     }
 
-    // 👇 LA NUEVA FUNCIÓN PARA DESAPARECER LA MISIÓN 👇
     public void ApagarMisiones()
     {
         if (contenedorMisiones != null) contenedorMisiones.SetActive(false);

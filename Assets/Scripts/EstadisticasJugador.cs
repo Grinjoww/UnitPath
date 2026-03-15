@@ -1,4 +1,4 @@
-﻿using StarterAssets; // Necesario para acceder a los Inputs
+﻿using StarterAssets;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -11,10 +11,13 @@ public class EstadisticasJugador : MonoBehaviour
     public float adaptacionActual = 50f;
     public float velocidadDesgaste = 1.5f;
 
+    [Header("--- AUDIO AMBIENTE ---")] // <--- 1. NUEVA SECCIÓN DE AUDIO
+    public AudioSource sonidoAmbiente;
+
     // Referencias internas
     private ThirdPersonController controladorMovimiento;
     private StarterAssetsInputs _input;
-    private Animator _animator; // <--- 1. AGREGAMOS EL ANIMATOR AQUÍ
+    private Animator _animator;
 
     // ESTADO
     private bool estaBloqueado = false;
@@ -26,7 +29,7 @@ public class EstadisticasJugador : MonoBehaviour
 
         controladorMovimiento = GetComponent<ThirdPersonController>();
         _input = GetComponent<StarterAssetsInputs>();
-        _animator = GetComponent<Animator>(); // <--- 2. LO CONECTAMOS AQUÍ
+        _animator = GetComponent<Animator>();
 
         if (controladorMovimiento != null) controladorMovimiento.enabled = true;
 
@@ -35,11 +38,17 @@ public class EstadisticasJugador : MonoBehaviour
 
         if (barraAdaptacion != null) barraAdaptacion.value = adaptacionActual;
         if (panelDerrota != null) panelDerrota.SetActive(false);
+
+        // 👇 EL CANDADO: Solo suena si la Intro ya se terminó o si el jugador revivió
+        if (CinematicaIntro.introYaVista && sonidoAmbiente != null)
+        {
+            sonidoAmbiente.Play();
+        }
     }
 
     void Update()
     {
-        // --- 1. BLOQUEO TOTAL DE INPUTS (Anti-Saltos) ---
+        // --- BLOQUEO TOTAL DE INPUTS ---
         if (estaBloqueado && _input != null)
         {
             _input.move = Vector2.zero;
@@ -47,7 +56,7 @@ public class EstadisticasJugador : MonoBehaviour
             _input.sprint = false;
         }
 
-        // --- 2. LÓGICA DE VIDA ---
+        // --- LÓGICA DE VIDA ---
         if (!estaBloqueado)
         {
             adaptacionActual -= velocidadDesgaste * Time.deltaTime;
@@ -81,20 +90,30 @@ public class EstadisticasJugador : MonoBehaviour
         {
             controladorMovimiento.LockCameraPosition = bloquear;
 
-            // --- 3. AQUÍ LE DECIMOS A LA ANIMACIÓN QUE SE DETENGA ---
             if (bloquear && _animator != null)
             {
                 _animator.SetFloat("Speed", 0f);
                 _animator.SetFloat("MotionSpeed", 1f);
             }
 
-            controladorMovimiento.enabled = !bloquear; // LA MAGIA
+            controladorMovimiento.enabled = !bloquear;
         }
 
         if (!bloquear && _input != null)
         {
             _input.jump = false;
         }
+    }
+
+    // <--- 3. FUNCIONES PARA APAGAR Y PRENDER EL SONIDO DESDE OTROS SCRIPTS
+    public void PausarSonidoAmbiente()
+    {
+        if (sonidoAmbiente != null) sonidoAmbiente.Pause();
+    }
+
+    public void ReanudarSonidoAmbiente()
+    {
+        if (sonidoAmbiente != null && !sonidoAmbiente.isPlaying) sonidoAmbiente.Play();
     }
 
     public void ReiniciarNivel()
@@ -110,5 +129,6 @@ public class EstadisticasJugador : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         BloquearMovimiento(true);
+        PausarSonidoAmbiente(); // También apagamos el sonido si te mueres
     }
 }
