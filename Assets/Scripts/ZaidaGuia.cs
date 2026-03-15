@@ -7,11 +7,14 @@ public class ZaidaGuia : MonoBehaviour
     public GameObject panelDialogo;
     public TMP_Text textoDialogo;
 
+    // 👇 AQUÍ ESTÁ LA NUEVA CASILLA PARA EL TEXTO "E" 👇
+    public GameObject avisoPresionarE;
+
     [Header("--- JUGADOR (ARRASTRA AQUÍ A TU PLAYER) ---")]
     public EstadisticasJugador statsJugador;
 
     [Header("--- MOVIMIENTO DE ZAIDA ---")]
-    public MovimientoZaida scriptMovimiento; // <--- 1. ¡NUEVA CASILLA!
+    public MovimientoZaida scriptMovimiento;
 
     [Header("--- LOS DIÁLOGOS ---")]
     [TextArea(3, 5)]
@@ -30,17 +33,24 @@ public class ZaidaGuia : MonoBehaviour
     void Start()
     {
         if (panelDialogo != null) panelDialogo.SetActive(false);
+        if (avisoPresionarE != null) avisoPresionarE.SetActive(false); // Empieza apagado
     }
 
     void Update()
     {
-        // SEGURIDAD: Si se te olvidó arrastrar al jugador, no hacemos nada para evitar errores
         if (statsJugador == null) return;
 
-        // Usamos la posición del script statsJugador directamente
         float distancia = Vector3.Distance(transform.position, statsJugador.transform.position);
+        bool jugadorCerca = distancia <= distanciaParaHablar;
 
-        if (distancia <= distanciaParaHablar)
+        // 👇 CONTROL AUTOMÁTICO DE LA "E" 👇
+        if (avisoPresionarE != null)
+        {
+            // Solo se muestra si estás cerca, NO estás hablando, y NO has terminado la charla
+            avisoPresionarE.SetActive(jugadorCerca && !hablando && !conversacionCompletada);
+        }
+
+        if (jugadorCerca)
         {
             // REGENERACIÓN
             statsJugador.adaptacionActual += regeneracionPorSegundo * Time.deltaTime;
@@ -67,9 +77,11 @@ public class ZaidaGuia : MonoBehaviour
         hablando = true;
         indiceFrase = 0;
 
+        // Apagamos la E manualmente por seguridad al empezar a hablar
+        if (avisoPresionarE != null) avisoPresionarE.SetActive(false);
+
         if (panelDialogo != null) panelDialogo.SetActive(true);
 
-        // AQUÍ ESTÁ LA CLAVE: Frenamos al jugador
         if (statsJugador != null) statsJugador.BloquearMovimiento(true);
 
         ActualizarTexto();
@@ -104,7 +116,8 @@ public class ZaidaGuia : MonoBehaviour
 
         if (panelDialogo != null) panelDialogo.SetActive(false);
 
-        // AQUÍ SOLTAMOS AL JUGADOR
+        FindFirstObjectByType<GestorMisiones>().ActualizarObjetivo("Sigue a Zaida, ella te guiará al centro médico.");
+
         if (statsJugador != null)
         {
             statsJugador.BloquearMovimiento(false);
@@ -114,7 +127,6 @@ public class ZaidaGuia : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        // --- 2. ¡AQUÍ ESTÁ LA LLAVE DE ENCENDIDO PARA ZAIDA! ---
         if (scriptMovimiento != null)
         {
             scriptMovimiento.IniciarViaje();

@@ -96,6 +96,8 @@ public class ActivadorDialogo : MonoBehaviour
         // 1. Ocultar el diálogo
         if (panelDialogo != null) panelDialogo.SetActive(false);
 
+        FindFirstObjectByType<GestorMisiones>().ApagarMisiones();
+
         // 2. ACTIVAR EL MINIJUEGO
         if (minijuegoParaActivar != null)
         {
