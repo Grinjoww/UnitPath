@@ -28,24 +28,24 @@ public class MinijuegoFlechas : MonoBehaviour
     public GameObject panelGameOver;
     public TextMeshProUGUI textoScoreFinal;
 
-    // ⭐ NUEVOS: Mejoras visuales
-    public TextMeshProUGUI textoCombo; // Opcional
-    public Image barraProgreso; // Opcional
-    public AudioClip sonidoAcierto; // Opcional
-    public AudioClip sonidoFallo; // Opcional
+
+    public TextMeshProUGUI textoCombo; 
+    public Image barraProgreso; 
+    public AudioClip sonidoAcierto; 
+    public AudioClip sonidoFallo; 
 
     private int score = 0;
-    private int combo = 0; // ⭐ NUEVO
+    private int combo = 0; 
     private List<GameObject> flechasActivas = new List<GameObject>();
     private float temporizador;
     private bool juegoActivo = true;
     private StarterAssets.ThirdPersonController playerController;
-    private AudioSource audioSource; // ⭐ NUEVO
+    private AudioSource audioSource; 
 
     void OnEnable()
     {
         score = 0;
-        combo = 0; // ⭐ NUEVO
+        combo = 0; 
         vidaActual = corazones.Length;
         juegoActivo = true;
         temporizador = 0f;
@@ -57,11 +57,10 @@ public class MinijuegoFlechas : MonoBehaviour
 
         ActualizarCorazones();
         ActualizarScore();
-        ActualizarCombo(); // ⭐ NUEVO
+        ActualizarCombo(); 
 
         if (panelGameOver != null) panelGameOver.SetActive(false);
 
-        // Desactivar personaje
         playerController = FindFirstObjectByType<StarterAssets.ThirdPersonController>();
         var playerInput = FindFirstObjectByType<StarterAssets.StarterAssetsInputs>();
         if (playerController != null) playerController.enabled = false;
@@ -70,7 +69,7 @@ public class MinijuegoFlechas : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // ⭐ NUEVO: Obtener AudioSource
+
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -195,7 +194,6 @@ public class MinijuegoFlechas : MonoBehaviour
         PerderVida();
     }
 
-    // ⭐ NUEVO: Crear efecto visual de acierto
     void CrearEfectoAcierto(RectTransform posicion)
     {
         if (posicion == null) return;
@@ -220,14 +218,14 @@ public class MinijuegoFlechas : MonoBehaviour
         StartCoroutine(ParpadeoZona(posicion, Color.green));
     }
 
-    // ⭐ NUEVO: Crear efecto visual de fallo
+    
     void CrearEfectoFallo(RectTransform posicion)
     {
         if (posicion == null) return;
         StartCoroutine(ParpadeoZona(posicion, Color.red));
     }
 
-    // ⭐ NUEVO: Animar texto flotante
+   
     IEnumerator AnimarTextoFlotante(RectTransform rect, CanvasGroup cg, GameObject obj)
     {
         float tiempo = 0f;
@@ -248,7 +246,6 @@ public class MinijuegoFlechas : MonoBehaviour
         Destroy(obj);
     }
 
-    // ⭐ NUEVO: Parpadeo de zona
     IEnumerator ParpadeoZona(RectTransform zona, Color color)
     {
         if (zona == null) yield break;
@@ -274,13 +271,13 @@ public class MinijuegoFlechas : MonoBehaviour
             img.color = colorOriginal;
     }
 
-    // ⭐ NUEVO: Animar zona presionada
+  
     void AnimarZonaPresionada(RectTransform zona)
     {
         StartCoroutine(EscalaZona(zona));
     }
 
-    // ⭐ NUEVO: Escala de zona
+  
     IEnumerator EscalaZona(RectTransform zona)
     {
         Vector3 escalaOriginal = zona.localScale;
@@ -325,14 +322,13 @@ public class MinijuegoFlechas : MonoBehaviour
         if (textoScore != null)
             textoScore.text = "Score: " + score;
 
-        // ⭐ NUEVO: Actualizar barra de progreso
         if (barraProgreso != null)
         {
             barraProgreso.fillAmount = Mathf.Min(score / 500f, 1f);
         }
     }
 
-    // ⭐ NUEVO: Actualizar combo
+   
     void ActualizarCombo()
     {
         if (textoCombo != null)
@@ -346,7 +342,6 @@ public class MinijuegoFlechas : MonoBehaviour
         }
     }
 
-    // ⭐ NUEVO: Animar combo
     IEnumerator AnimarCombo(TextMeshProUGUI texto)
     {
         Vector3 escalaOriginal = texto.transform.localScale;
@@ -377,7 +372,7 @@ public class MinijuegoFlechas : MonoBehaviour
     {
         juegoActivo = false;
 
-        // ⭐ NUEVO: Resetear emojis antes de mostrar game over
+
         SistemaEmojis sistemaEmojis = FindFirstObjectByType<SistemaEmojis>();
         if (sistemaEmojis != null)
             sistemaEmojis.Resetear();
@@ -388,41 +383,47 @@ public class MinijuegoFlechas : MonoBehaviour
         flechasActivas.Clear();
 
         if (textoScoreFinal != null)
-            textoScoreFinal.text = "Score final: " + score; // ⭐ MEJORADO: Mostrar combo también
+            textoScoreFinal.text = "Score final: " + score; 
 
         if (panelGameOver != null)
             panelGameOver.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         var canvasHUD = GameObject.Find("CanvasHUD");
-        if (canvasHUD != null) canvasHUD.SetActive(false);
+        if (canvasHUD != null)
+        {
+            var raycaster = canvasHUD.GetComponent<UnityEngine.UI.GraphicRaycaster>();
+            if (raycaster != null) raycaster.enabled = false;
+        }
     }
 
     public void Reintentar()
     {
         Debug.Log("REINTENTAR PRESIONADO");
         score = 0;
-        combo = 0; // ⭐ NUEVO
+        combo = 0; 
         vidaActual = corazones.Length;
         ActualizarCorazones();
         ActualizarScore();
-        ActualizarCombo(); // ⭐ NUEVO
+        ActualizarCombo(); 
         juegoActivo = true;
         if (panelGameOver != null)
             panelGameOver.SetActive(false);
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        // ⭐ NUEVO: Resetear emojis
         SistemaEmojis sistemaEmojis = FindFirstObjectByType<SistemaEmojis>();
         if (sistemaEmojis != null)
             sistemaEmojis.Resetear();
         var canvasHUD = GameObject.Find("CanvasHUD");
-        if (canvasHUD != null) canvasHUD.SetActive(true);
+        if (canvasHUD != null)
+        {
+            var raycaster = canvasHUD.GetComponent<UnityEngine.UI.GraphicRaycaster>();
+            if (raycaster != null) raycaster.enabled = true;
+        }
     }
 
     public void Salir()
     {
-        // Reactivar personaje
         var playerController2 = FindFirstObjectByType<StarterAssets.ThirdPersonController>(FindObjectsInactive.Include);
         if (playerController2 != null)
             playerController2.gameObject.SetActive(true);
@@ -431,10 +432,20 @@ public class MinijuegoFlechas : MonoBehaviour
         Cursor.visible = false;
         gameObject.transform.parent.gameObject.SetActive(false);
         var canvasHUD = GameObject.Find("CanvasHUD");
-        if (canvasHUD != null) canvasHUD.SetActive(true);
+        if (canvasHUD != null)
+        {
+            var raycaster = canvasHUD.GetComponent<UnityEngine.UI.GraphicRaycaster>();
+            if (raycaster != null) raycaster.enabled = true;
+        }
+        if (MisionHUD.instancia != null)
+            MisionHUD.instancia.ActualizarMision("<color=#57FF57><b>OBJETIVO ACTUALIZADO:</b></color>\nAbandona la biblioteca");
+        if (MisionHUD.instancia != null)
+            MisionHUD.instancia.CompletarMision();
+        GameObject luzSilla = GameObject.Find("LuzSilla");
+        if (luzSilla != null) luzSilla.SetActive(false);
     }
 
-    // ⭐ NUEVO: Reproducir sonido
+    //Reproducir sonido
     void PlaySound(AudioClip clip)
     {
         if (audioSource != null && clip != null)

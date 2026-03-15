@@ -69,7 +69,7 @@ public class SesionTerapia : MonoBehaviour
         }
     };
 
-    // Cuánto baja el estrés por opción (0=más, 2=menos)
+    // Cuánto baja el estrés por opción 
     private float[][] bajadaEstres = {
         new float[]{ 0.15f, 0.10f, 0.12f },
         new float[]{ 0.15f, 0.12f, 0.08f },
@@ -78,7 +78,7 @@ public class SesionTerapia : MonoBehaviour
         new float[]{ 0.15f, 0.12f, 0f }
     };
 
-    // Emoción por opción (0=feliz, 1=neutral, 2=incómodo)
+    // Emoción por opción 
     private int[][] emociones = {
         new int[]{ 1, 1, 0 },
         new int[]{ 2, 1, 0 },
@@ -143,7 +143,6 @@ public class SesionTerapia : MonoBehaviour
         if (spriteEmocion != null) spriteEmocion.gameObject.SetActive(false);
         if (textoEmocion != null) textoEmocion.gameObject.SetActive(false);
 
-        // Configurar botones
         for (int i = 0; i < botones.Length; i++)
         {
             string opcion = opciones[rondaActual][i];
@@ -183,10 +182,7 @@ public class SesionTerapia : MonoBehaviour
             textoEmocion.text = textosEmocion[emociones[rondaActual][indice]];
         }
 
-        // Desactivar botones temporalmente
         foreach (var b in botones) b.interactable = false;
-
-        // Siguiente ronda después de 2 segundos
         StartCoroutine(SiguienteRonda());
     }
 
@@ -195,7 +191,7 @@ public class SesionTerapia : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         esperandoContinuar = true;
         foreach (var b in botones) b.gameObject.SetActive(false);
-        textoPsicologa.text += "\n\n<size=18><color=yellow>[ ESPACIO para continuar ]</color></size>";
+        textoPsicologa.text += "\n\n<size=35><color=yellow>[ 'ESPACIO' para continuar ]</color></size>";
     }
 
     void ActualizarBarra()
@@ -226,6 +222,10 @@ public class SesionTerapia : MonoBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         yield return new WaitUntil(() => Input.GetKeyDown(KeyCode.Space));
+        if (MisionHUD.instancia != null)
+            MisionHUD.instancia.ActualizarMision("<color=#57FF57><b>OBJETIVO ACTUALIZADO:</b></color>\nAbandona la oficina de psicología");
+        if (MisionHUD.instancia != null)
+            MisionHUD.instancia.CompletarMision();
         SceneManager.LoadScene("Outro");
     }
 }

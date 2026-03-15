@@ -24,9 +24,10 @@ public class ActivadorMinijuego : MonoBehaviour
         {
             textoInteraccion.gameObject.SetActive(false);
 
-            // Desactivar el objeto raíz del personaje
             var playerArmature = playerController.gameObject;
             playerArmature.SetActive(false);
+            GameObject luzSilla = GameObject.Find("LuzSilla");
+            if (luzSilla != null) luzSilla.SetActive(false);
 
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;

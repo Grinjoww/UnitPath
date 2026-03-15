@@ -573,8 +573,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: '["ESPACIO" para continuar]'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1de85fe34120f1c41a2adb7f2e529e9f, type: 2}
-  m_sharedMaterial: {fileID: -1775671073454414460, guid: 1de85fe34120f1c41a2adb7f2e529e9f, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0e3488c84eb81d44ea0046585c95b517, type: 2}
+  m_sharedMaterial: {fileID: -1738257349286255987, guid: 0e3488c84eb81d44ea0046585c95b517, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -847,8 +847,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 1de85fe34120f1c41a2adb7f2e529e9f, type: 2}
-  m_sharedMaterial: {fileID: -1775671073454414460, guid: 1de85fe34120f1c41a2adb7f2e529e9f, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0e3488c84eb81d44ea0046585c95b517, type: 2}
+  m_sharedMaterial: {fileID: -1738257349286255987, guid: 0e3488c84eb81d44ea0046585c95b517, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -872,8 +872,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
-  m_fontSizeBase: 60
+  m_fontSize: 50
+  m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
